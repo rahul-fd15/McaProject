@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Bank Cards - Bank Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-navy mb-1">
+                <i class="fa-solid fa-credit-card text-warning me-2"></i>Bank Credit Card Management
+            </h3>
+            <p class="text-secondary small mb-0">
+                Monitor card lifecycle, credit lines, security locks (3+ wrong PINs), and fraud freezes.
+            </p>
+        </div>
+        <div>
+            <span class="badge bg-navy fs-6 px-3 py-2 text-warning">
+                <i class="fa-solid fa-layer-group me-1"></i> Total Cards: {{ cards|length }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Cards List Table -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5">
+        <div class="card-header bg-navy text-white d-flex justify-content-between align-items-center py-3">
+            <span class="fw-bold"><i class="fa-solid fa-id-card-clip me-2 text-warning"></i>Issued Customer Cards</span>
+            <span class="badge bg-secondary">PCI-DSS Compliant Masking</span>
+        </div>
+        <div class="table-responsive bg-white">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-secondary fs-xs text-uppercase">
+                    <tr>
+                        <th>Card ID</th>
+                        <th>Cardholder</th>
+                        <th>Masked Card Number</th>
+                        <th>Type</th>
+                        <th>Credit Limit</th>
+                        <th>Available Limit</th>
+                        <th>Expiry Date</th>
+                        <th>Failed PINs</th>
+                        <th>Status</th>
+                        <th>Admin Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in cards %}
+                    <tr>
+                        <td class="font-monospace fw-bold">#CRD-{{ c.card_id }}</td>
+                        <td>
+                            <div class="fw-bold text-dark">{{ c.customer_name }}</div>
+                            <div class="text-muted fs-xs">{{ c.customer_email }} &bull; {{ c.phone }}</div>
+                        </td>
+                        <td class="font-monospace fw-semibold">{{ c.card_number_masked }}</td>
+                        <td>
+                            <span class="badge bg-light text-dark border">{{ c.card_type }}</span>
+                        </td>
+                        <td class="fw-bold text-dark">Rs. {{ "{:,.2f}".format(c.credit_limit) }}</td>
+                        <td class="text-primary fw-semibold">Rs. {{ "{:,.2f}".format(c.available_limit) }}</td>
+                        <td class="small text-muted">{{ c.expiry_date }}</td>
+                        <td>
+                            {% if c.failed_pin_attempts >= 3 %}
+                                <span class="badge bg-danger"><i class="fa-solid fa-lock me-1"></i>{{ c.failed_pin_attempts }} (LOCKED)</span>
+                            {% elif c.failed_pin_attempts > 0 %}
+                                <span class="badge bg-warning text-dark">{{ c.failed_pin_attempts }} attempts</span>
+                            {% else %}
+                                <span class="text-muted small">0</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if c.status == 'ACTIVE' %}
+                                <span class="badge bg-success"><i class="fa-solid fa-circle-check me-1"></i>ACTIVE</span>
+                            {% elif c.status == 'LOCKED' %}
+                                <span class="badge bg-warning text-dark"><i class="fa-solid fa-lock me-1"></i>PIN LOCKED</span>
+                            {% else %}
+                                <span class="badge bg-danger"><i class="fa-solid fa-ban me-1"></i>BLOCKED</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if c.status == 'ACTIVE' %}
+                            <form method="POST" action="{{ url_for('admin_card_toggle') }}" class="d-inline">
+                                <input type="hidden" name="card_id" value="{{ c.card_id }}">
+                                <input type="hidden" name="status" value="BLOCKED">
+                                <button type="submit" class="btn btn-outline-danger btn-xs" onclick="return confirm('Freeze card {{ c.short_masked }}?')">
+                                    <i class="fa-solid fa-ban me-1"></i> Freeze
+                                </button>
+                            </form>
+                            {% else %}
+                            <form method="POST" action="{{ url_for('admin_card_toggle') }}" class="d-inline">
+                                <input type="hidden" name="card_id" value="{{ c.card_id }}">
+                                <input type="hidden" name="status" value="ACTIVE">
+                                <button type="submit" class="btn btn-success btn-xs" onclick="return confirm('Restore & Unblock card {{ c.short_masked }}?')">
+                                    <i class="fa-solid fa-unlock me-1"></i> Unblock & Reset PIN
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

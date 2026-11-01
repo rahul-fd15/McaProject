@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Open Account - Secure Bank{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-navy text-white text-center py-4">
+                    <div class="brand-icon mx-auto mb-2 bg-primary-subtle text-primary" style="width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </div>
+                    <h4 class="fw-bold mb-1">Open Customer Account</h4>
+                    <p class="text-white-50 small mb-0">Includes Instant Credit Card Issuance with Rs. 1,00,000 Limit</p>
+                </div>
+
+                <div class="card-body p-4 bg-white">
+                    <form method="POST" action="{{ url_for('customer_register') }}">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-dark">Full Legal Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-id-card"></i></span>
+                                <input type="text" name="full_name" class="form-control" placeholder="e.g. Rahul R A" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold text-dark">Email Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-envelope"></i></span>
+                                    <input type="email" name="email" class="form-control" placeholder="rahul@example.com" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold text-dark">Phone Number (SMS Alert)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-phone"></i></span>
+                                    <input type="text" name="phone" class="form-control" placeholder="+919876543210" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-dark">Residential Address</label>
+                            <input type="text" name="address" class="form-control" placeholder="City, State, Pincode" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold text-dark">Login Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-lock"></i></span>
+                                    <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold text-dark">Card PIN (4 digits)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-key"></i></span>
+                                    <input type="password" name="pin" maxlength="4" pattern="\d{4}" class="form-control" placeholder="1234" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info py-2 small d-flex align-items-center gap-2 mb-4">
+                            <i class="fa-solid fa-circle-info fs-5"></i>
+                            <span>A virtual <strong>Visa Platinum Card</strong> with <strong>Rs. 1,00,000 credit limit</strong> will be created automatically.</span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold shadow-sm mb-3">
+                            <i class="fa-solid fa-check-circle me-2"></i> Complete Registration & Issue Card
+                        </button>
+
+                        <div class="text-center small text-secondary">
+                            Already have an account? <a href="{{ url_for('customer_login') }}" class="text-primary fw-semibold text-decoration-none">Log in here</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

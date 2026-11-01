@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Review Fraud Alerts - Bank Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-navy mb-1">
+                <i class="fa-solid fa-triangle-exclamation text-warning me-2"></i>Fraud Alert Review Desk
+            </h3>
+            <p class="text-secondary small mb-0">
+                Inspect transactions flagged by Random Forest & Isolation Forest with 1-click customer protection actions.
+            </p>
+        </div>
+        <div>
+            <span class="badge bg-danger fs-6 px-3 py-2">
+                <i class="fa-solid fa-bell me-1"></i> Total Alerts: {{ alerts|length }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Alerts Table -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5">
+        <div class="card-header bg-navy text-white d-flex justify-content-between align-items-center py-3">
+            <span class="fw-bold"><i class="fa-solid fa-shield-virus me-2 text-warning"></i>Active Security Alerts</span>
+            <span class="badge bg-secondary">Decision Engine: RF (70%) + Isolation Forest (30%)</span>
+        </div>
+        <div class="table-responsive bg-white">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-secondary fs-xs text-uppercase">
+                    <tr>
+                        <th>Alert ID</th>
+                        <th>Alert Time</th>
+                        <th>Customer</th>
+                        <th>Card</th>
+                        <th>Merchant & Location</th>
+                        <th>Amount</th>
+                        <th>Risk Score</th>
+                        <th>RF Prob</th>
+                        <th>ISO Score</th>
+                        <th>Rule Hit Explanation</th>
+                        <th>Status</th>
+                        <th>Admin Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in alerts %}
+                    <tr class="{% if a.alert_status == 'NEW' %}table-warning-subtle{% endif %}">
+                        <td class="font-monospace fw-bold">#ALT-{{ a.alert_id }}</td>
+                        <td class="small text-secondary">{{ a.alert_time }}</td>
+                        <td>
+                            <div class="fw-bold text-dark">{{ a.customer_name }}</div>
+                            <div class="text-muted fs-xs"><i class="fa-solid fa-phone me-1"></i>{{ a.customer_phone }}</div>
+                        </td>
+                        <td class="font-monospace small">
+                            {{ a.short_masked }}
+                            <div class="fs-xs {% if a.card_status == 'ACTIVE' %}text-success{% else %}text-danger fw-bold{% endif %}">
+                                [{{ a.card_status }}]
+                            </div>
+                        </td>
+                        <td>
+                            <div class="fw-semibold text-dark">{{ a.merchant }}</div>
+                            <div class="text-muted fs-xs">{{ a.location }}</div>
+                        </td>
+                        <td class="fw-bold text-dark">Rs. {{ "{:,.2f}".format(a.amount) }}</td>
+                        <td>
+                            <span class="badge {% if a.risk_score >= 70 %}bg-danger{% elif a.risk_score >= 40 %}bg-warning text-dark{% else %}bg-success{% endif %} font-monospace fs-sm">
+                                {{ a.risk_score }} / 100
+                            </span>
+                        </td>
+                        <td class="font-monospace small text-primary fw-semibold">
+                            {{ "{:.1f}%".format(a.rf_prob * 100) }}
+                        </td>
+                        <td class="font-monospace small text-info-emphasis fw-semibold">
+                            {{ "{:.1f}%".format(a.iso_score * 100) }}
+                        </td>
+                        <td class="small text-secondary" style="max-width: 250px;">
+                            {{ a.rule_hit }}
+                        </td>
+                        <td>
+                            {% if a.alert_status == 'NEW' %}
+                                <span class="badge bg-warning text-dark"><i class="fa-solid fa-clock me-1"></i>NEW</span>
+                            {% elif a.alert_status == 'BLOCKED' %}
+                                <span class="badge bg-danger"><i class="fa-solid fa-ban me-1"></i>BLOCKED</span>
+                            {% elif a.alert_status == 'REVIEWED' %}
+                                <span class="badge bg-success"><i class="fa-solid fa-check me-1"></i>REVIEWED</span>
+                            {% else %}
+                                <span class="badge bg-secondary"><i class="fa-solid fa-xmark me-1"></i>DISMISSED</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                {% if a.card_status != 'BLOCKED' %}
+                                <form method="POST" action="{{ url_for('admin_alert_action') }}" class="d-inline">
+                                    <input type="hidden" name="alert_id" value="{{ a.alert_id }}">
+                                    <input type="hidden" name="action" value="BLOCK">
+                                    <button type="submit" class="btn btn-danger btn-xs" title="Block Card and Send SMS Alert">
+                                        <i class="fa-solid fa-ban me-1"></i> Block
+                                    </button>
+                                </form>
+                                {% else %}
+                                <form method="POST" action="{{ url_for('admin_alert_action') }}" class="d-inline">
+                                    <input type="hidden" name="alert_id" value="{{ a.alert_id }}">
+                                    <input type="hidden" name="action" value="UNBLOCK">
+                                    <button type="submit" class="btn btn-success btn-xs" title="Unblock Card and Restore Access">
+                                        <i class="fa-solid fa-unlock me-1"></i> Unblock
+                                    </button>
+                                </form>
+                                {% endif %}
+
+                                {% if a.alert_status == 'NEW' %}
+                                <form method="POST" action="{{ url_for('admin_alert_action') }}" class="d-inline ms-1">
+                                    <input type="hidden" name="alert_id" value="{{ a.alert_id }}">
+                                    <input type="hidden" name="action" value="DISMISS">
+                                    <button type="submit" class="btn btn-outline-secondary btn-xs" title="Dismiss False Positive">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="12" class="text-center py-4 text-muted">No security alerts currently active.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

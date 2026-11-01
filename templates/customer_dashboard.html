@@ -1,0 +1,484 @@
+{% extends "base.html" %}
+
+{% block title %}Customer Dashboard - Secure Bank{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5">
+    <!-- Header Greeting -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-navy mb-1">
+                <i class="fa-solid fa-wallet text-primary me-2"></i>Welcome, {{ customer.full_name }}
+            </h3>
+            <p class="text-secondary small mb-0">
+                Registered Mobile: <strong>{{ customer.phone }}</strong> &bull; Shield Protection: <span class="badge bg-success-subtle text-success">HYBRID ML ACTIVE</span>
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-navy btn-sm" data-bs-toggle="modal" data-bs-target="#smsDrawerModal">
+                <i class="fa-solid fa-mobile-screen me-1 text-primary"></i> Phone SMS Inbox
+                <span class="badge bg-danger rounded-pill ms-1" id="smsCountBadge">{{ recent_sms|length }}</span>
+            </button>
+            <a href="#paymentSection" class="btn btn-primary btn-sm">
+                <i class="fa-solid fa-credit-card me-1"></i> Make Transaction
+            </a>
+        </div>
+    </div>
+
+    <!-- Cards & Limits Showcase -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                <div class="card-header bg-navy text-white d-flex justify-content-between align-items-center py-3">
+                    <span class="fw-bold"><i class="fa-solid fa-credit-card me-2 text-warning"></i>My Issued Cards</span>
+                    <span class="badge bg-secondary">{{ cards|length }} Linked</span>
+                </div>
+                <div class="card-body p-4 bg-white">
+                    {% for c in cards %}
+                    <div class="card-visual-wrapper mb-3 p-4 rounded-4 text-white position-relative shadow {% if c.status == 'BLOCKED' or c.status == 'LOCKED' %}card-frozen{% endif %}">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="fw-bold tracking-tight"><i class="fa-solid fa-building-columns me-1"></i> SECURE BANK</span>
+                            <span class="badge {% if c.status == 'ACTIVE' %}bg-success{% elif c.status == 'LOCKED' %}bg-warning text-dark{% else %}bg-danger{% endif %} text-uppercase">
+                                {{ c.status }}
+                            </span>
+                        </div>
+
+                        <div class="card-chip mb-2">
+                            <div class="chip-line"></div>
+                        </div>
+
+                        <div class="fs-4 font-monospace tracking-wide mb-3">
+                            {{ c.card_number_masked }}
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-end small">
+                            <div>
+                                <div class="text-white-50 fs-xs text-uppercase">Card Holder</div>
+                                <div class="fw-semibold">{{ customer.full_name }}</div>
+                            </div>
+                            <div>
+                                <div class="text-white-50 fs-xs text-uppercase">Expires</div>
+                                <div class="fw-semibold">{{ c.expiry_date }}</div>
+                            </div>
+                            <div class="fs-5 fw-bold fst-italic">
+                                {{ c.card_type }}
+                            </div>
+                        </div>
+
+                        {% if c.status == 'LOCKED' %}
+                        <div class="alert alert-warning py-1 px-2 mt-2 mb-0 small text-center fw-bold">
+                            <i class="fa-solid fa-lock me-1"></i> Card LOCKED (3 Failed PIN Attempts). Contact bank.
+                        </div>
+                        {% elif c.status == 'BLOCKED' %}
+                        <div class="alert alert-danger py-1 px-2 mt-2 mb-0 small text-center fw-bold">
+                            <i class="fa-solid fa-ban me-1"></i> Card BLOCKED due to suspected fraud.
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Credit Limit Meter -->
+                    <div class="p-3 bg-light rounded-3 border mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="small fw-semibold text-secondary">Credit Utilization</span>
+                            <span class="small fw-bold text-dark">{{ c.used_percent }}% Used</span>
+                        </div>
+                        <div class="progress mb-2" style="height: 8px;">
+                            <div class="progress-bar {% if c.used_percent > 70 %}bg-danger{% elif c.used_percent > 40 %}bg-warning{% else %}bg-success{% endif %}" style="width: {{ c.used_percent }}%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted fs-xs">
+                            <span>Available: <strong>Rs. {{ "{:,.2f}".format(c.available_limit) }}</strong></span>
+                            <span>Limit: <strong>Rs. {{ "{:,.2f}".format(c.credit_limit) }}</strong></span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- POS Terminal / Payment Gateway Simulation (Module 3) -->
+        <div class="col-lg-6" id="paymentSection">
+            <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                <div class="card-header bg-navy text-white d-flex justify-content-between align-items-center py-3">
+                    <span class="fw-bold"><i class="fa-solid fa-cash-register me-2 text-warning"></i>Simulate Card Swipe / Payment Gateway</span>
+                    <span class="badge bg-warning text-dark"><i class="fa-solid fa-shield-halved me-1"></i>ML Screened</span>
+                </div>
+                <div class="card-body p-4 bg-white">
+                    <p class="text-secondary small mb-3">
+                        Execute a live transaction. Each swipe passes through <strong>Random Forest</strong> & <strong>Isolation Forest</strong> models to compute a 0-100 Risk Score.
+                    </p>
+
+                    <!-- Quick Demo Presets -->
+                    <div class="mb-3">
+                        <label class="form-label fs-xs text-muted fw-bold text-uppercase">1-Click Test Scenarios</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="button" class="btn btn-outline-success btn-xs" onclick="setPreset('Reliance Fresh', 1450, 'Domestic Store', '1234')">
+                                <i class="fa-solid fa-cart-shopping me-1"></i> Normal Grocery (Rs. 1,450)
+                            </button>
+                            <button type="button" class="btn btn-outline-warning btn-xs" onclick="setPreset('Online Store Electronics', 24500, 'International Gateway', '1234')">
+                                <i class="fa-solid fa-laptop me-1"></i> Suspicious Spike (Rs. 24,500)
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-xs" onclick="setPreset('Binance Crypto Exchange', 85000, 'Offshore / Unknown IP', '1234')">
+                                <i class="fa-solid fa-coins me-1"></i> Critical Fraud (Rs. 85,000)
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-xs" onclick="setPreset('Fuel Station', 2500, 'Bangalore, India', '9999')">
+                                <i class="fa-solid fa-key me-1"></i> Wrong PIN Test (9999)
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="paymentForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-dark">Select Card</label>
+                            <select name="card_id" id="cardSelect" class="form-select" required>
+                                {% for c in cards %}
+                                <option value="{{ c.card_id }}" {% if c.status != 'ACTIVE' %}disabled{% endif %}>
+                                    {{ c.card_type }} - {{ c.card_number_masked }} (Avail: Rs. {{ "{:,.2f}".format(c.available_limit) }}) {% if c.status != 'ACTIVE' %}[{{ c.status }}]{% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold text-dark">Merchant Name</label>
+                                <input type="text" name="merchant" id="merchantInput" class="form-control" placeholder="e.g. Amazon India" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold text-dark">Amount (INR &pound;)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">Rs.</span>
+                                    <input type="number" step="0.01" name="amount" id="amountInput" class="form-control" placeholder="2500.00" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-7 mb-3">
+                                <label class="form-label fw-semibold text-dark">Transaction Location / IP</label>
+                                <input type="text" name="location" id="locationInput" class="form-control" placeholder="Domestic POS / City" required>
+                            </div>
+                            <div class="col-md-5 mb-3">
+                                <label class="form-label fw-semibold text-dark">Card PIN</label>
+                                <input type="password" maxlength="4" name="pin" id="pinInput" class="form-control font-monospace" placeholder="••••" required>
+                                <span class="fs-xs text-muted">Default demo PIN: <strong>1234</strong></span>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="submitPaymentBtn" class="btn btn-navy w-100 py-2 fw-semibold shadow-sm">
+                            <i class="fa-solid fa-bolt me-1 text-warning"></i> Authorize & Screen Transaction
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction History Table -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5">
+        <div class="card-header bg-navy text-white d-flex justify-content-between align-items-center py-3">
+            <span class="fw-bold"><i class="fa-solid fa-list-check me-2 text-warning"></i>Recent Card Transactions</span>
+            <span class="badge bg-secondary">{{ transactions|length }} Records</span>
+        </div>
+        <div class="table-responsive bg-white">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-secondary fs-xs text-uppercase">
+                    <tr>
+                        <th>Txn ID</th>
+                        <th>Time</th>
+                        <th>Card</th>
+                        <th>Merchant</th>
+                        <th>Location</th>
+                        <th>Amount</th>
+                        <th>Risk Score</th>
+                        <th>Status</th>
+                        <th>Fraud Detection Rule / Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in transactions %}
+                    <tr>
+                        <td class="font-monospace fw-bold">#{{ t.txn_id }}</td>
+                        <td class="small text-secondary">{{ t.txn_time }}</td>
+                        <td class="font-monospace small">{{ t.card_masked }}</td>
+                        <td class="fw-semibold text-dark">{{ t.merchant }}</td>
+                        <td class="small text-muted">{{ t.location }}</td>
+                        <td class="fw-bold text-dark">Rs. {{ "{:,.2f}".format(t.amount) }}</td>
+                        <td>
+                            {% if t.risk_score is not none %}
+                                <span class="badge {% if t.risk_score >= 70 %}bg-danger{% elif t.risk_score >= 40 %}bg-warning text-dark{% else %}bg-success{% endif %} font-monospace">
+                                    {{ t.risk_score }} / 100
+                                </span>
+                            {% else %}
+                                <span class="text-muted small">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if t.status == 'APPROVED' %}
+                                <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="fa-solid fa-check me-1"></i>APPROVED</span>
+                            {% elif t.status == 'FLAGGED' %}
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle"><i class="fa-solid fa-triangle-exclamation me-1"></i>FLAGGED</span>
+                            {% elif t.status == 'BLOCKED' %}
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="fa-solid fa-ban me-1"></i>BLOCKED</span>
+                            {% else %}
+                                <span class="badge bg-secondary-subtle text-secondary border"><i class="fa-solid fa-xmark me-1"></i>DECLINED</span>
+                            {% endif %}
+                        </td>
+                        <td class="small text-secondary">
+                            {{ t.rule_hit or 'Clean transaction pattern' }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">No transactions found on this account yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Live Transaction Feedback & ML Score Breakdown -->
+<div class="modal fade" id="txnResultModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header text-white" id="modalHeader">
+                <h5 class="modal-title fw-bold" id="modalTitle">
+                    <i class="fa-solid fa-shield-halved me-2"></i> Transaction Screening Result
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" onclick="location.reload()"></button>
+            </div>
+            <div class="modal-body p-4 bg-white">
+                <div class="text-center mb-3">
+                    <div id="statusBadgeContainer"></div>
+                    <h3 class="fw-bold mt-2 mb-1" id="modalAmount">Rs. 0.00</h3>
+                    <div class="text-secondary small" id="modalMerchant">Merchant</div>
+                </div>
+
+                <!-- Risk Score Gauge -->
+                <div class="p-3 rounded-3 bg-light border mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="small fw-semibold text-secondary">Hybrid ML Risk Score</span>
+                        <span class="fw-bold font-monospace fs-5" id="modalRiskScore">0 / 100</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 10px;">
+                        <div id="modalRiskBar" class="progress-bar" style="width: 0%"></div>
+                    </div>
+
+                    <!-- RF & Isolation Forest Breakdown -->
+                    <div class="row g-2 pt-2 border-top text-center fs-xs">
+                        <div class="col-6">
+                            <span class="text-muted d-block">Random Forest (70%)</span>
+                            <strong class="text-primary font-monospace" id="modalRfProb">0.0%</strong>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted d-block">Isolation Forest (30%)</span>
+                            <strong class="text-info-emphasis font-monospace" id="modalIsoScore">0.0%</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-light border small mb-3">
+                    <div class="fw-semibold text-dark"><i class="fa-solid fa-circle-info text-primary me-1"></i> Screening Decision & Rule:</div>
+                    <div class="text-secondary" id="modalRuleHit">Evaluating...</div>
+                </div>
+
+                <!-- Live Dispatched SMS Preview -->
+                <div id="modalSmsContainer" style="display: none;">
+                    <div class="p-3 rounded-3 bg-navy text-white small">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <span class="text-warning fw-bold"><i class="fa-solid fa-comment-sms me-1"></i> SMS Alert Sent to Customer Mobile</span>
+                            <span class="badge bg-success fs-xs">DELIVERED</span>
+                        </div>
+                        <div class="font-monospace text-white-50" id="modalSmsText">SMS Content</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light p-3">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" onclick="location.reload()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Customer Mobile Phone SMS Inbox Drawer -->
+<div class="modal fade" id="smsDrawerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden phone-frame">
+            <div class="phone-notch"></div>
+            <div class="card-header bg-navy text-white py-3 px-3 d-flex justify-content-between align-items-center">
+                <span class="fw-bold small"><i class="fa-solid fa-comments text-warning me-1"></i> SMS Messages</span>
+                <span class="badge bg-secondary fs-xs">{{ customer.phone }}</span>
+            </div>
+            <div class="modal-body p-3 bg-light" style="max-height: 420px; overflow-y: auto;" id="smsInboxContainer">
+                {% for s in recent_sms %}
+                <div class="sms-bubble mb-2 p-2 rounded-3 bg-white shadow-sm border">
+                    <div class="d-flex justify-content-between align-items-center fs-xs text-muted mb-1">
+                        <span class="fw-bold text-navy">SECURE BANK</span>
+                        <span>{{ s.sent_time }}</span>
+                    </div>
+                    <div class="small text-dark font-monospace">{{ s.message }}</div>
+                    <div class="text-end mt-1">
+                        <span class="badge bg-success-subtle text-success fs-xs">{{ s.sms_status }}</span>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4 small">
+                    <i class="fa-regular fa-comment-dots fs-3 d-block mb-2"></i>
+                    No SMS alerts received yet.
+                </div>
+                {% endfor %}
+            </div>
+            <div class="modal-footer p-2 bg-white justify-content-center">
+                <button type="button" class="btn btn-outline-secondary btn-xs" data-bs-dismiss="modal">Close Phone</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Floating AI Chatbot Support Assistant (Module 6) -->
+<div id="chatbot-container">
+    <!-- Floating Launcher Pill/Button -->
+    <button id="chatbot-toggle-btn" class="shadow-lg" title="Open 24/7 AI Customer Support">
+        <i class="fa-solid fa-robot"></i>
+        <span class="chatbot-pulse"></span>
+    </button>
+
+    <!-- Chat Window Container -->
+    <div id="chatbot-window" class="shadow-lg" style="display: none;">
+        <div class="chat-header bg-navy text-white p-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+                <div class="rounded-circle bg-warning text-dark p-2" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-robot fs-6"></i>
+                </div>
+                <div>
+                    <div class="fw-bold small">SecureBank AI Assistant</div>
+                    <div class="fs-xs text-success-light"><i class="fa-solid fa-circle text-success fs-xs me-1"></i>Online 24/7</div>
+                </div>
+            </div>
+            <button id="chatbot-close-btn" class="btn btn-sm text-white-50 p-0 fs-5">&times;</button>
+        </div>
+
+        <!-- Chat Messages Body -->
+        <div id="chat-messages" class="p-3 bg-light">
+            <div class="chat-bubble bot-msg">
+                Hello {{ customer.full_name }}! I am your 24/7 Bank Support Assistant. I can help explain flagged transactions, show your recent history, or freeze your card if you spot fraud.
+            </div>
+        </div>
+
+        <!-- Chat Quick Suggestion Pills -->
+        <div class="chat-quick-actions p-2 bg-white border-top border-bottom d-flex gap-1 overflow-x-auto">
+            <button type="button" class="btn btn-xs btn-outline-primary whitespace-nowrap" onclick="sendQuickChat('Why was my last payment flagged?')">Why flagged?</button>
+            <button type="button" class="btn btn-xs btn-outline-secondary whitespace-nowrap" onclick="sendQuickChat('Show my last transactions')">Recent txns</button>
+            <button type="button" class="btn btn-xs btn-outline-secondary whitespace-nowrap" onclick="sendQuickChat('What is my card limit?')">Card limit</button>
+            <button type="button" class="btn btn-xs btn-outline-danger whitespace-nowrap" onclick="sendQuickChat('I did not do this. Block my card.')">Report fraud</button>
+        </div>
+
+        <!-- Chat Input Form -->
+        <form id="chat-form" class="p-2 bg-white d-flex gap-2">
+            <input type="text" id="chat-input" class="form-control form-control-sm" placeholder="Ask a question..." autocomplete="off">
+            <button type="submit" class="btn btn-primary btn-sm px-3">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+<script>
+function setPreset(merchant, amount, location, pin) {
+    document.getElementById('merchantInput').value = merchant;
+    document.getElementById('amountInput').value = amount;
+    document.getElementById('locationInput').value = location;
+    document.getElementById('pinInput').value = pin;
+}
+
+// Payment form submission with Live Modal Feedback
+document.getElementById('paymentForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitPaymentBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Screening with Hybrid ML...';
+
+    const formData = new FormData(this);
+
+    fetch("{{ url_for('process_transaction') }}", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-bolt me-1 text-warning"></i> Authorize & Screen Transaction';
+
+        const modal = new bootstrap.Modal(document.getElementById('txnResultModal'));
+        const header = document.getElementById('modalHeader');
+        const badgeContainer = document.getElementById('statusBadgeContainer');
+        const modalAmount = document.getElementById('modalAmount');
+        const modalMerchant = document.getElementById('modalMerchant');
+        const modalRiskScore = document.getElementById('modalRiskScore');
+        const modalRiskBar = document.getElementById('modalRiskBar');
+        const modalRfProb = document.getElementById('modalRfProb');
+        const modalIsoScore = document.getElementById('modalIsoScore');
+        const modalRuleHit = document.getElementById('modalRuleHit');
+        const smsContainer = document.getElementById('modalSmsContainer');
+        const smsText = document.getElementById('modalSmsText');
+
+        if (data.success) {
+            modalAmount.innerText = `Rs. ${parseFloat(data.amount).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            modalMerchant.innerText = `Merchant: ${data.merchant}`;
+            modalRiskScore.innerText = `${data.risk_score} / 100`;
+            modalRiskBar.style.width = `${data.risk_score}%`;
+            modalRfProb.innerText = `${(data.rf_prob * 100).toFixed(1)}%`;
+            modalIsoScore.innerText = `${(data.iso_score * 100).toFixed(1)}%`;
+            modalRuleHit.innerText = data.rule_hit;
+
+            if (data.status === 'APPROVED') {
+                header.className = 'modal-header bg-success text-white';
+                badgeContainer.innerHTML = '<span class="badge bg-success fs-6 px-3 py-2"><i class="fa-solid fa-circle-check me-1"></i> TRANSACTION APPROVED</span>';
+                modalRiskBar.className = 'progress-bar bg-success';
+                smsContainer.style.display = 'none';
+            } else if (data.status === 'FLAGGED') {
+                header.className = 'modal-header bg-warning text-dark';
+                badgeContainer.innerHTML = '<span class="badge bg-warning text-dark fs-6 px-3 py-2"><i class="fa-solid fa-triangle-exclamation me-1"></i> SUSPICIOUS - FLAGGED WITH SMS</span>';
+                modalRiskBar.className = 'progress-bar bg-warning';
+                if (data.sms_dispatched) {
+                    smsContainer.style.display = 'block';
+                    smsText.innerText = data.sms_message;
+                }
+            } else if (data.status === 'BLOCKED') {
+                header.className = 'modal-header bg-danger text-white';
+                badgeContainer.innerHTML = '<span class="badge bg-danger fs-6 px-3 py-2"><i class="fa-solid fa-ban me-1"></i> FRAUD BLOCKED - CARD FROZEN</span>';
+                modalRiskBar.className = 'progress-bar bg-danger';
+                if (data.sms_dispatched) {
+                    smsContainer.style.display = 'block';
+                    smsText.innerText = data.sms_message;
+                }
+            }
+        } else {
+            // Decline / Lock case
+            header.className = 'modal-header bg-dark text-white';
+            modalAmount.innerText = "Transaction Declined";
+            modalMerchant.innerText = data.message;
+            badgeContainer.innerHTML = `<span class="badge bg-danger fs-6 px-3 py-2">${data.decision || 'FAILED'}</span>`;
+            modalRiskScore.innerText = "N/A";
+            modalRiskBar.style.width = "0%";
+            modalRfProb.innerText = "-";
+            modalIsoScore.innerText = "-";
+            modalRuleHit.innerText = data.message;
+            smsContainer.style.display = 'none';
+        }
+
+        modal.show();
+    })
+    .catch(err => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-bolt me-1 text-warning"></i> Authorize & Screen Transaction';
+        alert('Server connection error. Please try again.');
+    });
+});
+</script>
+{% endblock %}

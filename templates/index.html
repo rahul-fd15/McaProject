@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block title %}Credit Card Fraud Detection System - Dummy Bank{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="row align-items-center py-5">
+        <div class="col-lg-7">
+            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-primary-subtle text-primary fw-semibold small mb-3">
+                <i class="fa-solid fa-graduation-cap"></i> MCA Mini Project Review Presentation
+            </div>
+            <h1 class="display-5 fw-extrabold text-navy lh-tight mb-3">
+                Credit Card Fraud Detection System
+                <span class="d-block text-primary fs-3 fw-bold mt-1">Implemented on a Real-time Bank System</span>
+            </h1>
+            <p class="lead text-secondary mb-4">
+                A production-grade banking system that inspects credit card transactions in real-time using a 
+                <strong>Hybrid Machine Learning</strong> pipeline: <strong>Random Forest</strong> (supervised) + <strong>Isolation Forest</strong> (unsupervised anomaly detector), integrated with an automated <strong>SMS Alert Tool</strong> and an interactive <strong>Customer Support Chatbot</strong>.
+            </p>
+            
+            <div class="d-flex flex-wrap gap-3 mb-4">
+                <a href="{{ url_for('customer_login') }}" class="btn btn-primary btn-lg px-4 shadow-sm">
+                    <i class="fa-solid fa-user me-2"></i> Open Customer Portal
+                </a>
+                <a href="{{ url_for('admin_login') }}" class="btn btn-dark btn-lg px-4 shadow-sm">
+                    <i class="fa-solid fa-shield-halved me-2 text-warning"></i> Access Bank Admin Console
+                </a>
+                <a href="{{ url_for('admin_simulator') }}" class="btn btn-outline-secondary btn-lg px-3">
+                    <i class="fa-solid fa-flask me-1 text-info"></i> ML Sandbox
+                </a>
+            </div>
+
+            <!-- Authors Card -->
+            <div class="p-3 bg-white rounded-3 shadow-sm border border-secondary-subtle d-inline-block">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle bg-warning-subtle text-warning p-2">
+                        <i class="fa-solid fa-users fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted small fw-semibold">PROJECT PRESENTED BY</div>
+                        <div class="fw-bold text-dark">Rahul R A &bull; Yedhu Krishnan G</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5 mt-4 mt-lg-0">
+            <!-- Graphical Credit Card Showcase -->
+            <div class="card-glass-showcase p-4 rounded-4 shadow-lg text-white position-relative overflow-hidden">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="fw-bold fs-5 tracking-tight"><i class="fa-solid fa-building-columns me-2"></i>SECURE BANK</div>
+                    <span class="badge bg-warning text-dark fw-bold px-3 py-1">HYBRID ML ACTIVE</span>
+                </div>
+                
+                <div class="card-chip mb-3">
+                    <div class="chip-line"></div>
+                </div>
+
+                <div class="fs-4 font-monospace tracking-wide mb-3">
+                    •••• &nbsp; •••• &nbsp; •••• &nbsp; 4821
+                </div>
+
+                <div class="d-flex justify-content-between align-items-end">
+                    <div>
+                        <div class="text-white-50 fs-xs text-uppercase">Card Holder</div>
+                        <div class="fw-semibold">RAHUL R A</div>
+                    </div>
+                    <div>
+                        <div class="text-white-50 fs-xs text-uppercase">Expires</div>
+                        <div class="fw-semibold">12/28</div>
+                    </div>
+                    <div class="fs-3 fw-bold fst-italic">
+                        VISA
+                    </div>
+                </div>
+
+                <!-- Floating Live Alert Tag -->
+                <div class="live-alert-tag mt-3 p-2 rounded-2 bg-dark bg-opacity-75 border border-warning small">
+                    <i class="fa-solid fa-bell text-warning me-1"></i> Real-time SMS & Chatbot Assistance Enabled
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hybrid ML Architecture Explainer -->
+    <div class="row g-4 my-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-navy text-white py-3 px-4 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold"><i class="fa-solid fa-diagram-project me-2 text-warning"></i>Hybrid ML Fraud Detection Architecture</h5>
+                    <span class="badge bg-warning text-dark">Kaggle Dataset (V1-V28, Time, Amount)</span>
+                </div>
+                <div class="card-body p-4 bg-white">
+                    <div class="row g-4 align-items-center">
+                        <div class="col-md-4">
+                            <div class="p-3 border rounded-3 bg-light text-center h-100">
+                                <span class="badge bg-primary mb-2">Supervised Model</span>
+                                <h5 class="fw-bold text-dark">Random Forest</h5>
+                                <p class="text-secondary small mb-2">Trained on labeled Kaggle past fraud transactions to recognize known patterns.</p>
+                                <div class="font-monospace text-primary fw-bold">Output: RF Prob (0.00 – 1.00)</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="p-3 border rounded-3 bg-light text-center h-100">
+                                <span class="badge bg-info text-dark mb-2">Unsupervised Model</span>
+                                <h5 class="fw-bold text-dark">Isolation Forest</h5>
+                                <p class="text-secondary small mb-2">Isolates anomalies in few tree splits; catches unseen & zero-day novel fraud patterns.</p>
+                                <div class="font-monospace text-info-emphasis fw-bold">Output: ISO Score (0.00 – 1.00)</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="p-3 border rounded-3 bg-dark text-white text-center h-100">
+                                <span class="badge bg-warning text-dark mb-2">Weighted Blend</span>
+                                <h5 class="fw-bold text-warning">Combined Risk Score</h5>
+                                <div class="font-monospace fs-sm text-warning mb-2">
+                                    0.7 &times; (RF &times; 100) + 0.3 &times; (ISO &times; 100)
+                                </div>
+                                <div class="small text-white-50">Range: <strong>0 – 100</strong></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Risk Bands Grid -->
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-4">
+                            <div class="p-3 rounded-3 bg-success-subtle border border-success-subtle">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-success">0 – 39: APPROVE</span>
+                                    <i class="fa-solid fa-check-circle text-success fs-5"></i>
+                                </div>
+                                <p class="small text-success-emphasis mt-2 mb-0">Normal spending pattern. Transaction approved instantly with zero friction.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 rounded-3 bg-warning-subtle border border-warning-subtle">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-warning text-dark">40 – 69: FLAG & SMS</span>
+                                    <i class="fa-solid fa-triangle-exclamation text-warning fs-5"></i>
+                                </div>
+                                <p class="small text-warning-emphasis mt-2 mb-0">Suspicious activity. Transaction flagged and instant SMS alert sent to customer.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 rounded-3 bg-danger-subtle border border-danger-subtle">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-danger">70+: BLOCK CARD & SMS</span>
+                                    <i class="fa-solid fa-ban text-danger fs-5"></i>
+                                </div>
+                                <p class="small text-danger-emphasis mt-2 mb-0">Critical fraud threat detected. Card blocked immediately & alert sent to customer + admin.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7 Project Modules Grid (Slide 4) -->
+    <div class="my-5">
+        <div class="text-center mb-4">
+            <h3 class="fw-bold text-navy">Seven Functional Project Modules</h3>
+            <p class="text-secondary">Fully implemented matching the MCA Mini Project specification</p>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-3 rounded-3">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-primary rounded-circle p-2"><i class="fa-solid fa-user"></i></span>
+                        <h6 class="fw-bold mb-0">1. Customer Module</h6>
+                    </div>
+                    <p class="text-secondary small mb-0">Register, login, view card details, execute payments, inspect transaction history, and receive alerts.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-3 rounded-3">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-dark rounded-circle p-2"><i class="fa-solid fa-user-shield"></i></span>
+                        <h6 class="fw-bold mb-0">2. Bank Admin Module</h6>
+                    </div>
+                    <p class="text-secondary small mb-0">Monitor live transactions, review fraud alerts, block/unblock cards, and analyze system KPIs.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-3 rounded-3">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-success rounded-circle p-2"><i class="fa-solid fa-credit-card"></i></span>
+                        <h6 class="fw-bold mb-0">3. Transaction Processing</h6>
+                    </div>
+                    <p class="text-secondary small mb-0">Validates card number, expiry, credit limit, and enforces 3+ wrong PIN security lockout.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-3 rounded-3">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-danger rounded-circle p-2"><i class="fa-solid fa-brain"></i></span>
+                        <h6 class="fw-bold mb-0">4. Fraud Detection Module</h6>
+                    </div>
+                    <p class="text-secondary small mb-0">Passes each swipe to Random Forest + Isolation Forest, yielding 0-100 Risk Score.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-3 rounded-3">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-warning rounded-circle p-2 text-dark"><i class="fa-solid fa-bell"></i></span>
+                        <h6 class="fw-bold mb-0">5. Alert & Report Module</h6>
+                    </div>
+                    <p class="text-secondary small mb-0">Stores flagged transactions with rule reasons, manages alert workflows, and exports CSV reports.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-3 rounded-3">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-info rounded-circle p-2 text-dark"><i class="fa-solid fa-robot"></i></span>
+                        <h6 class="fw-bold mb-0">6. Chatbot Module</h6>
+                    </div>
+                    <p class="text-secondary small mb-0">24/7 AI banking support assistant: shows recent transactions, explains flagged rules, and raises block requests.</p>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="card border-0 shadow-sm p-3 rounded-3 bg-navy text-white">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-warning text-dark rounded-circle p-2"><i class="fa-solid fa-comment-sms"></i></span>
+                            <h6 class="fw-bold mb-0 text-warning">7. SMS Notification Module (Twilio / Fast2SMS / Mock Gateway)</h6>
+                        </div>
+                        <span class="badge bg-secondary text-uppercase fs-xs">Strict &lt; 160 Characters &bull; Masked XX4821</span>
+                    </div>
+                    <p class="text-white-50 small mt-2 mb-0">Sends instant SMS alerts to registered mobile numbers on risk score &ge; 40 or 3 wrong PIN attempts. Logs every transition (QUEUED &rarr; SENT &rarr; DELIVERED).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Quick Access Credentials Section -->
+    <div class="p-4 bg-white rounded-4 shadow-sm border border-secondary-subtle my-5">
+        <h5 class="fw-bold text-navy mb-3"><i class="fa-solid fa-key text-warning me-2"></i>Quick Demo Test Credentials</h5>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="border rounded-3 p-3 bg-light">
+                    <div class="fw-bold text-dark"><i class="fa-solid fa-user me-1 text-primary"></i> Customer (Rahul R A)</div>
+                    <div class="small text-secondary">Email: <code>rahul@bank.com</code></div>
+                    <div class="small text-secondary">Password: <code>password123</code> | PIN: <code>1234</code></div>
+                    <div class="small text-muted">Card: Visa ending in <strong>4821</strong></div>
+                    <a href="{{ url_for('customer_login') }}" class="btn btn-sm btn-outline-primary mt-2 w-100">Login as Rahul</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="border rounded-3 p-3 bg-light">
+                    <div class="fw-bold text-dark"><i class="fa-solid fa-user me-1 text-info"></i> Customer (Yedhu Krishnan)</div>
+                    <div class="small text-secondary">Email: <code>yedhu@bank.com</code></div>
+                    <div class="small text-secondary">Password: <code>password123</code> | PIN: <code>1234</code></div>
+                    <div class="small text-muted">Card: Visa ending in <strong>9012</strong></div>
+                    <a href="{{ url_for('customer_login') }}" class="btn btn-sm btn-outline-info mt-2 w-100">Login as Yedhu</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="border rounded-3 p-3 bg-light">
+                    <div class="fw-bold text-dark"><i class="fa-solid fa-user-shield me-1 text-danger"></i> Bank Admin</div>
+                    <div class="small text-secondary">Username: <code>admin</code></div>
+                    <div class="small text-secondary">Password: <code>admin123</code></div>
+                    <div class="small text-muted">Role: <strong>Chief Risk Officer</strong></div>
+                    <a href="{{ url_for('admin_login') }}" class="btn btn-sm btn-outline-danger mt-2 w-100">Login as Admin</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}SMS Gateway Logs - Bank Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-navy mb-1">
+                <i class="fa-solid fa-comment-sms text-warning me-2"></i>SMS Gateway Delivery Audit Trail
+            </h3>
+            <p class="text-secondary small mb-0">
+                Module 7 &bull; Real-time logging of customer fraud alerts, delivery status (QUEUED &rarr; DELIVERED), and masked card numbers.
+            </p>
+        </div>
+        <div>
+            <span class="badge bg-primary fs-6 px-3 py-2">
+                <i class="fa-solid fa-signal me-1"></i> Mode: {{ config.SMS_GATEWAY_MODE }}
+            </span>
+        </div>
+    </div>
+
+    <!-- SMS Logs Table -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5">
+        <div class="card-header bg-navy text-white d-flex justify-content-between align-items-center py-3">
+            <span class="fw-bold"><i class="fa-solid fa-paper-plane me-2 text-warning"></i>Dispatched SMS Messages ({{ logs|length }} Total)</span>
+            <span class="badge bg-secondary">Constraint: &le; 160 Characters</span>
+        </div>
+        <div class="table-responsive bg-white">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-secondary fs-xs text-uppercase">
+                    <tr>
+                        <th>SMS ID</th>
+                        <th>Sent Time</th>
+                        <th>Alert ID</th>
+                        <th>Risk Score</th>
+                        <th>Destination Mobile</th>
+                        <th>Message Content (&le; 160 Chars)</th>
+                        <th>Length</th>
+                        <th>Delivery Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in logs %}
+                    <tr>
+                        <td class="font-monospace fw-bold">#SMS-{{ s.sms_id }}</td>
+                        <td class="small text-secondary">{{ s.sent_time }}</td>
+                        <td class="font-monospace small">
+                            {% if s.alert_id %}#ALT-{{ s.alert_id }}{% else %}<span class="text-muted">Security Lock</span>{% endif %}
+                        </td>
+                        <td>
+                            {% if s.risk_score is not none %}
+                                <span class="badge {% if s.risk_score >= 70 %}bg-danger{% elif s.risk_score >= 40 %}bg-warning text-dark{% else %}bg-success{% endif %} font-monospace">
+                                    {{ s.risk_score }} / 100
+                                </span>
+                            {% else %}
+                                <span class="badge bg-secondary">Rule Hit</span>
+                            {% endif %}
+                        </td>
+                        <td class="font-monospace text-dark fw-semibold">{{ s.phone }}</td>
+                        <td class="small font-monospace text-navy" style="max-width: 450px;">
+                            {{ s.message }}
+                        </td>
+                        <td class="small text-muted font-monospace">
+                            {{ s.message|length }} / 160
+                        </td>
+                        <td>
+                            {% if s.sms_status == 'DELIVERED' %}
+                                <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="fa-solid fa-check-double me-1"></i>DELIVERED</span>
+                            {% elif s.sms_status == 'SENT' %}
+                                <span class="badge bg-info-subtle text-info border border-info-subtle"><i class="fa-solid fa-check me-1"></i>SENT</span>
+                            {% elif s.sms_status == 'QUEUED' %}
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle"><i class="fa-solid fa-clock me-1"></i>QUEUED</span>
+                            {% else %}
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="fa-solid fa-xmark me-1"></i>FAILED</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">No SMS alert records found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

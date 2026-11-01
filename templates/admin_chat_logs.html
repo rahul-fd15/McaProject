@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Chatbot Audit Logs - Bank Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-navy mb-1">
+                <i class="fa-solid fa-headset text-warning me-2"></i>Customer Support Chatbot Audit Trail
+            </h3>
+            <p class="text-secondary small mb-0">
+                Module 6 &bull; Natural language conversations, classified intents, and automated card protection responses.
+            </p>
+        </div>
+        <div>
+            <span class="badge bg-navy fs-6 px-3 py-2 text-warning">
+                <i class="fa-solid fa-comments me-1"></i> Total Interactions: {{ logs|length }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Chat Logs Table -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5">
+        <div class="card-header bg-navy text-white d-flex justify-content-between align-items-center py-3">
+            <span class="fw-bold"><i class="fa-solid fa-robot me-2 text-warning"></i>Customer Inquiry History (CHAT_LOG D7)</span>
+            <span class="badge bg-secondary">Intent Classifier & Safe Masking</span>
+        </div>
+        <div class="table-responsive bg-white">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-secondary fs-xs text-uppercase">
+                    <tr>
+                        <th>Chat ID</th>
+                        <th>Timestamp</th>
+                        <th>Customer</th>
+                        <th>User Query Message</th>
+                        <th>Classified Intent</th>
+                        <th>Automated Bot Response</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in logs %}
+                    <tr>
+                        <td class="font-monospace fw-bold">#CHT-{{ c.chat_id }}</td>
+                        <td class="small text-secondary">{{ c.chat_time }}</td>
+                        <td>
+                            <div class="fw-semibold text-dark">{{ c.full_name }}</div>
+                            <div class="text-muted fs-xs">{{ c.email }}</div>
+                        </td>
+                        <td class="small fw-semibold text-dark" style="max-width: 250px;">
+                            "{{ c.user_message }}"
+                        </td>
+                        <td>
+                            {% if c.intent == 'why_flagged' %}
+                                <span class="badge bg-warning text-dark"><i class="fa-solid fa-circle-question me-1"></i>why_flagged</span>
+                            {% elif c.intent == 'report_fraud' %}
+                                <span class="badge bg-danger"><i class="fa-solid fa-triangle-exclamation me-1"></i>report_fraud</span>
+                            {% elif c.intent == 'block_card' %}
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="fa-solid fa-ban me-1"></i>block_card</span>
+                            {% elif c.intent == 'txn_history' %}
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle"><i class="fa-solid fa-clock-rotate-left me-1"></i>txn_history</span>
+                            {% elif c.intent == 'card_info' %}
+                                <span class="badge bg-info-subtle text-info border border-info-subtle"><i class="fa-solid fa-credit-card me-1"></i>card_info</span>
+                            {% else %}
+                                <span class="badge bg-secondary-subtle text-secondary border">faq</span>
+                            {% endif %}
+                        </td>
+                        <td class="small text-secondary font-monospace" style="max-width: 450px;">
+                            {{ c.bot_reply }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">No chatbot interactions recorded yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

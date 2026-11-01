@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}About Project - Credit Card Fraud Detection System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden p-4 bg-white">
+        <h3 class="fw-bold text-navy mb-2"><i class="fa-solid fa-graduation-cap text-warning me-2"></i>MCA Mini Project - First Review</h3>
+        <h5 class="text-secondary fw-semibold mb-4">Credit Card Fraud Detection System Implemented on a Bank system</h5>
+
+        <div class="p-3 bg-light rounded-3 border mb-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="text-muted small fw-bold">PRESENTED BY</div>
+                    <div class="fw-bold text-dark fs-5">Rahul R A &bull; Yedhu Krishnan G</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="text-muted small fw-bold">TECHNOLOGY STACK</div>
+                    <div class="text-dark">Python 3.14 &bull; Flask &bull; scikit-learn (Random Forest & Isolation Forest) &bull; SQLite/MySQL &bull; Bootstrap 5</div>
+                </div>
+            </div>
+        </div>
+
+        <h5 class="fw-bold text-navy mt-3"><i class="fa-solid fa-brain text-primary me-2"></i>Hybrid Machine Learning Formula</h5>
+        <p class="text-secondary">
+            Every transaction is screened in real time by two complementary models:
+        </p>
+        <div class="p-3 rounded-3 bg-navy text-white font-monospace text-center mb-4">
+            Risk Score (0–100) = 0.7 &times; (RF fraud probability &times; 100) + 0.3 &times; (Isolation Forest anomaly score &times; 100)
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="p-3 border rounded-3 bg-success-subtle border-success-subtle">
+                    <div class="fw-bold text-success">Score 0 – 39: Approve</div>
+                    <div class="small text-secondary">Clean transaction. Processed immediately with zero customer disruption.</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 border rounded-3 bg-warning-subtle border-warning-subtle">
+                    <div class="fw-bold text-warning-emphasis">Score 40 – 69: Flag & SMS Alert</div>
+                    <div class="small text-secondary">Unusual amount, location, or merchant category. Triggers SMS alert to customer.</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 border rounded-3 bg-danger-subtle border-danger-subtle">
+                    <div class="fw-bold text-danger">Score 70+: Block Card & SMS Alert</div>
+                    <div class="small text-secondary">Severe fraud risk or novel anomaly vector. Freezes card immediately.</div>
+                </div>
+            </div>
+        </div>
+
+        <h5 class="fw-bold text-navy mt-2"><i class="fa-solid fa-lock text-danger me-2"></i>Security Rule: Wrong PIN Lockout</h5>
+        <p class="text-secondary small">
+            Entering 3 consecutive incorrect PINs immediately locks the card independently of the ML score. This prevents brute-force attempts on lost or stolen cards.
+        </p>
+    </div>
+</div>
+{% endblock %}

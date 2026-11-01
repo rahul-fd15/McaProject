@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Live ML Fraud Simulator - Secure Bank{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="text-center mb-4">
+        <span class="badge bg-primary-subtle text-primary px-3 py-1 rounded-pill fw-semibold mb-2">
+            <i class="fa-solid fa-flask-vial me-1"></i> Interactive Model Testbed &bull; Viva Demonstration
+        </span>
+        <h2 class="fw-bold text-navy">Hybrid ML Fraud Detection Sandbox</h2>
+        <p class="text-secondary small max-w-700 mx-auto">
+            Test and evaluate the dual-model architecture: <strong>Random Forest</strong> (supervised pattern matcher) + <strong>Isolation Forest</strong> (unsupervised anomaly detector).
+        </p>
+    </div>
+
+    <div class="row g-4">
+        <!-- Input Form -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                <div class="card-header bg-navy text-white py-3 d-flex justify-content-between align-items-center">
+                    <span class="fw-bold"><i class="fa-solid fa-sliders me-2 text-warning"></i>Transaction Parameters</span>
+                    <span class="badge bg-warning text-dark">Live Scoring</span>
+                </div>
+                <div class="card-body p-4 bg-white">
+                    <!-- Presets -->
+                    <div class="mb-3">
+                        <label class="form-label fs-xs text-muted fw-bold text-uppercase">Quick Viva Demo Presets</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="button" class="btn btn-xs btn-outline-success" onclick="loadSimPreset(350, 'Starbucks Coffee', 'Bangalore, India', 11)">
+                                Low Risk Normal (Rs. 350)
+                            </button>
+                            <button type="button" class="btn btn-xs btn-outline-warning" onclick="loadSimPreset(24500, 'Online Store Electronics', 'International Gateway', 2)">
+                                Suspicious Flag (Rs. 24,500)
+                            </button>
+                            <button type="button" class="btn btn-xs btn-outline-danger" onclick="loadSimPreset(85000, 'Binance Crypto Exchange', 'Offshore / Moscow IP', 3)">
+                                Critical Fraud (Rs. 85,000)
+                            </button>
+                        </div>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('admin_simulator') }}">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-dark">Transaction Amount (INR)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">Rs.</span>
+                                    <input type="number" step="0.01" name="amount" id="simAmount" class="form-control" value="{{ result.input_amount if result else '24500.00' }}" required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-dark">Hour of Day (0–23)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fa-regular fa-clock"></i></span>
+                                    <input type="number" min="0" max="23" name="hour" id="simHour" class="form-control" value="{{ result.input_hour if result else '2' }}" required>
+                                </div>
+                                <span class="fs-xs text-muted">Night hours (1–5 AM) exhibit higher anomaly index</span>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-dark">Merchant Name</label>
+                                <input type="text" name="merchant" id="simMerchant" class="form-control" value="{{ result.input_merchant if result else 'Online Store Electronics' }}" required>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-dark">Geo-Location / Network Origin</label>
+                                <input type="text" name="location" id="simLocation" class="form-control" value="{{ result.input_location if result else 'International Gateway' }}" required>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-dark">
+                                    Optional: Custom 28 PCA Components (V1..V28)
+                                </label>
+                                <textarea name="v_components" rows="2" class="form-control font-monospace fs-xs" placeholder="Comma-separated 28 floats (Leave empty to use automated banking vector synthesis)"></textarea>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-navy w-100 py-2 fw-semibold shadow-sm mt-4">
+                            <i class="fa-solid fa-play me-2 text-warning"></i> Run Hybrid ML Fraud Evaluation
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Output Results Card -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                <div class="card-header bg-navy text-white py-3 d-flex justify-content-between align-items-center">
+                    <span class="fw-bold"><i class="fa-solid fa-microchip me-2 text-warning"></i>Model Prediction Output</span>
+                    {% if result %}
+                        <span class="badge {% if result.decision == 'APPROVED' %}bg-success{% elif result.decision == 'FLAGGED' %}bg-warning text-dark{% else %}bg-danger{% endif %} text-uppercase">
+                            {{ result.decision }}
+                        </span>
+                    {% endif %}
+                </div>
+                <div class="card-body p-4 bg-white">
+                    {% if result %}
+                        <!-- Risk Score Gauge -->
+                        <div class="p-4 rounded-4 bg-light border text-center mb-4">
+                            <div class="text-secondary fs-xs fw-bold text-uppercase mb-1">Blended Hybrid Risk Score</div>
+                            <div class="display-4 fw-extrabold font-monospace {% if result.risk_score >= 70 %}text-danger{% elif result.risk_score >= 40 %}text-warning{% else %}text-success{% endif %}">
+                                {{ result.risk_score }} <span class="fs-4 text-muted">/ 100</span>
+                            </div>
+
+                            <div class="progress my-3" style="height: 12px;">
+                                <div class="progress-bar {% if result.risk_score >= 70 %}bg-danger{% elif result.risk_score >= 40 %}bg-warning{% else %}bg-success{% endif %}" style="width: {{ result.risk_score }}%"></div>
+                            </div>
+
+                            <!-- Mathematical Formula Representation -->
+                            <div class="p-2 rounded-2 bg-white border font-monospace fs-xs text-dark">
+                                Risk Score = 0.7 &times; ({{ (result.rf_prob * 100)|round(1) }}%) + 0.3 &times; ({{ (result.iso_score * 100)|round(1) }}%) = <strong>{{ result.risk_score }}</strong>
+                            </div>
+                        </div>
+
+                        <!-- Dual Models Breakdown -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-6">
+                                <div class="p-3 rounded-3 border bg-white text-center h-100">
+                                    <span class="badge bg-primary-subtle text-primary mb-1">Supervised (Weight 70%)</span>
+                                    <div class="fw-bold text-dark">Random Forest</div>
+                                    <div class="fs-3 fw-bold font-monospace text-primary">
+                                        {{ "{:.2f}%".format(result.rf_prob * 100) }}
+                                    </div>
+                                    <div class="fs-xs text-muted">Fraud Probability</div>
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="p-3 rounded-3 border bg-white text-center h-100">
+                                    <span class="badge bg-info-subtle text-info mb-1">Unsupervised (Weight 30%)</span>
+                                    <div class="fw-bold text-dark">Isolation Forest</div>
+                                    <div class="fs-3 fw-bold font-monospace text-info-emphasis">
+                                        {{ "{:.2f}%".format(result.iso_score * 100) }}
+                                    </div>
+                                    <div class="fs-xs text-muted">Outlier Path Anomaly</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Decision Explanation -->
+                        <div class="alert {% if result.decision == 'APPROVED' %}alert-success{% elif result.decision == 'FLAGGED' %}alert-warning{% else %}alert-danger{% endif %} small mb-3">
+                            <div class="fw-bold"><i class="fa-solid fa-triangle-exclamation me-1"></i> Decision: {{ result.decision }}</div>
+                            <div>{{ result.rule_hit }}</div>
+                        </div>
+
+                        <!-- System Action -->
+                        <div class="p-3 rounded-3 bg-light border small">
+                            <div class="fw-semibold text-dark mb-1">Automated System Action:</div>
+                            {% if result.decision == 'APPROVED' %}
+                                <div class="text-success"><i class="fa-solid fa-check me-1"></i> Transaction approved and authorized immediately.</div>
+                            {% elif result.decision == 'FLAGGED' %}
+                                <div class="text-warning-emphasis"><i class="fa-solid fa-bell me-1"></i> Transaction held. Instant SMS sent to customer mobile with dispute instruction.</div>
+                            {% else %}
+                                <div class="text-danger"><i class="fa-solid fa-ban me-1"></i> Transaction blocked. Card frozen immediately. High priority fraud alert logged.</div>
+                            {% endif %}
+                        </div>
+
+                    {% else %}
+                        <div class="text-center py-5 text-muted">
+                            <i class="fa-solid fa-chart-line fs-1 d-block mb-3 text-secondary"></i>
+                            <h5>No Evaluation Performed Yet</h5>
+                            <p class="small">Enter transaction parameters or pick a preset on the left, then click <strong>Run Hybrid ML Fraud Evaluation</strong>.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function loadSimPreset(amt, merch, loc, hr) {
+    document.getElementById('simAmount').value = amt;
+    document.getElementById('simMerchant').value = merch;
+    document.getElementById('simLocation').value = loc;
+    document.getElementById('simHour').value = hr;
+}
+</script>
+{% endblock %}

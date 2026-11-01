@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Credit Card Fraud Detection System - MCA Mini Project Report</title>
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 15mm 18mm 15mm 18mm;
+    @bottom-right {
+      content: counter(page);
+    }
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    background-color: #ffffff;
+    line-height: 1.5;
+    font-size: 10pt;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Page Break Utilities */
+  .page-break {
+    page-break-before: always;
+  }
+  .avoid-break {
+    page-break-inside: avoid;
+  }
+
+  /* Cover Page */
+  .cover-container {
+    height: 98vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+    border: 2px solid #0f2537;
+    padding: 40px 30px;
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+  }
+
+  .cover-top h3 {
+    font-size: 13pt;
+    letter-spacing: 2px;
+    color: #475569;
+    margin: 0 0 5px 0;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .cover-top h4 {
+    font-size: 11pt;
+    letter-spacing: 1px;
+    color: #1e3a8a;
+    margin: 0;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .cover-badge {
+    display: inline-block;
+    background: #0f2537;
+    color: #ffffff;
+    padding: 6px 18px;
+    font-size: 10pt;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    border-radius: 20px;
+    margin-top: 25px;
+    text-transform: uppercase;
+  }
+
+  .cover-middle {
+    margin: 20px 0;
+  }
+
+  .cover-middle h1 {
+    font-size: 20pt;
+    color: #0f2537;
+    margin: 0 0 12px 0;
+    font-weight: 800;
+    line-height: 1.25;
+    text-transform: uppercase;
+  }
+
+  .cover-middle .subtitle {
+    font-size: 11pt;
+    color: #334155;
+    max-width: 90%;
+    margin: 0 auto;
+    line-height: 1.45;
+    font-weight: 500;
+  }
+
+  .cover-middle .accent-bar {
+    width: 80px;
+    height: 4px;
+    background: #2563eb;
+    margin: 18px auto;
+    border-radius: 2px;
+  }
+
+  .cover-bottom {
+    display: flex;
+    justify-content: space-between;
+    text-align: left;
+    border-top: 1px solid #cbd5e1;
+    padding-top: 25px;
+    margin-top: 15px;
+  }
+
+  .author-box, .meta-box {
+    width: 48%;
+  }
+
+  .author-box h5, .meta-box h5 {
+    font-size: 10pt;
+    color: #64748b;
+    margin: 0 0 8px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .author-name {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #0f2537;
+    margin: 3px 0;
+  }
+
+  .meta-item {
+    font-size: 9.5pt;
+    color: #334155;
+    margin: 3px 0;
+  }
+
+  /* Section Styling */
+  h2.section-title {
+    font-size: 14pt;
+    color: #0f2537;
+    border-bottom: 2px solid #1e3a8a;
+    padding-bottom: 5px;
+    margin-top: 20px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+  }
+
+  h2.section-title::before {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 18px;
+    background: #2563eb;
+    margin-right: 8px;
+    border-radius: 2px;
+  }
+
+  h3.subsection-title {
+    font-size: 11pt;
+    color: #1e3a8a;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0 0 8px 0;
+    text-align: justify;
+    line-height: 1.5;
+  }
+
+  /* Abstract Box */
+  .abstract-box {
+    background: #f1f5f9;
+    border-left: 4px solid #2563eb;
+    padding: 14px 18px;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 15px;
+  }
+
+  .abstract-box p {
+    font-size: 9.5pt;
+    line-height: 1.55;
+    margin: 0 0 6px 0;
+  }
+
+  .keywords-tag {
+    font-size: 9pt;
+    font-weight: 600;
+    color: #0f2537;
+    margin-top: 6px;
+  }
+
+  /* Grid Layouts */
+  .grid-2 {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 12px;
+  }
+
+  .card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    flex: 1;
+  }
+
+  .card.highlight {
+    border-top: 3px solid #2563eb;
+  }
+
+  .card h4 {
+    margin: 0 0 6px 0;
+    font-size: 10pt;
+    color: #0f2537;
+    font-weight: 700;
+  }
+
+  /* Tables */
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 15px 0;
+    font-size: 8.5pt;
+  }
+
+  table.data-table th {
+    background: #0f2537;
+    color: #ffffff;
+    text-align: left;
+    padding: 6px 10px;
+    font-weight: 600;
+    border: 1px solid #0f2537;
+  }
+
+  table.data-table td {
+    padding: 6px 10px;
+    border: 1px solid #cbd5e1;
+    vertical-align: top;
+  }
+
+  table.data-table tr:nth-child(even) {
+    background-color: #f8fafc;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-size: 7.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .badge-primary { background: #dbeafe; color: #1e40af; }
+  .badge-success { background: #dcfce7; color: #166534; }
+  .badge-warning { background: #fef3c7; color: #92400e; }
+  .badge-danger { background: #fee2e2; color: #991b1b; }
+
+  /* Formula Callout */
+  .formula-callout {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 10px 0;
+    text-align: center;
+  }
+
+  .formula-text {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: #1e3a8a;
+  }
+
+  /* Diagram SVGs */
+  .diagram-container {
+    background: #fafbfc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 10px;
+    text-align: center;
+    margin: 10px 0 14px 0;
+  }
+
+  .diagram-caption {
+    font-size: 8.5pt;
+    color: #64748b;
+    font-style: italic;
+    margin-top: 6px;
+  }
+
+  /* Viva QA Box */
+  .qa-card {
+    background: #f8fafc;
+    border-left: 3px solid #10b981;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .qa-question {
+    font-weight: 700;
+    color: #0f2537;
+    font-size: 9pt;
+    margin-bottom: 3px;
+  }
+
+  .qa-answer {
+    font-size: 8.5pt;
+    color: #334155;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover-container">
+  <div class="cover-top">
+    <h3>Department of Computer Applications</h3>
+    <h4>Master of Computer Applications (MCA) Degree Program</h4>
+    <div class="cover-badge">Mini Project &bull; First Review Document</div>
+  </div>
+
+  <div class="cover-middle">
+    <h1>Multi-Tier Credit Card Fraud Detection System</h1>
+    <div class="subtitle">
+      An End-to-End Banking Framework Combining Supervised Random Forest, Unsupervised Isolation Forest, Real-Time SMS Dispatch, and an Interactive Conversational Support Assistant
+    </div>
+    <div class="accent-bar"></div>
+    <p style="text-align:center; color:#475569; font-size:9.5pt; margin-top:8px;">
+      Comprehensive Project Report & Architectural Specifications
+    </p>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="author-box">
+      <h5>Project Team Members</h5>
+      <div class="author-name">1. Rahul R A</div>
+      <div class="meta-item">MCA Candidate &bull; Machine Learning & Backend Architecture</div>
+      <div class="author-name" style="margin-top:8px;">2. Yedhu Krishnan G</div>
+      <div class="meta-item">MCA Candidate &bull; Full-Stack Development & API Integration</div>
+    </div>
+    <div class="meta-box">
+      <h5>Project Details</h5>
+      <div class="meta-item"><strong>Review Stage:</strong> First Review / Design Milestone</div>
+      <div class="meta-item"><strong>Core Technology:</strong> Python 3.x, Scikit-Learn, MySQL</div>
+      <div class="meta-item"><strong>Dataset:</strong> Benchmark Kaggle Credit Card Fraud Dataset</div>
+      <div class="meta-item"><strong>Integration:</strong> Twilio / Fast2SMS API Gateway</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- SECTION 1: ABSTRACT & OVERVIEW -->
+<h2 class="section-title">1. Executive Abstract & Metadata</h2>
+
+<div class="abstract-box">
+  <p>
+    <strong>Academic Abstract:</strong> With the rapid global expansion of digital payments, credit card fraud poses severe financial and security threats to banking infrastructures and customer trust. This project introduces a multi-layered, automated <strong>Credit Card Fraud Detection System</strong> integrated with a simulated full-stack core banking application. To simultaneously mitigate known fraud vectors and detect emerging zero-day anomalies, the architecture deploys a <strong>hybrid machine learning pipeline</strong> comprising a supervised <strong>Random Forest classifier</strong> (trained on the benchmark Kaggle transaction dataset) and an unsupervised <strong>Isolation Forest anomaly detector</strong>.
+  </p>
+  <p>
+    Every card transaction is evaluated in real time to generate a consolidated risk score bounded between 0 and 100. Based on calibrated security thresholds, transactions are dynamically routed: low-risk requests are approved instantly, moderate-risk transactions trigger automated <strong>SMS notifications</strong> to the customer's registered phone number, and high-risk events result in immediate card deactivation. Additionally, an integrated conversational <strong>support chatbot</strong> assists cardholders in querying alert rationales, reviewing recent transactions, and requesting instant card freezes. A centralized <strong>bank admin portal</strong> provides real-time fraud monitoring, manual review capabilities, card management, and comprehensive reporting.
+  </p>
+  <div class="keywords-tag">
+    <strong>Keywords:</strong> Credit Card Fraud Detection, Hybrid Machine Learning, Random Forest, Isolation Forest, Anomaly Detection, Twilio Gateway, Support Chatbot, Relational Database Design.
+  </div>
+</div>
+
+<div class="grid-2 avoid-break">
+  <div class="card highlight">
+    <h4>Project Objectives</h4>
+    <ul style="padding-left:16px; margin:4px 0; font-size:9pt;">
+      <li>Accurately detect known fraud patterns using supervised classification.</li>
+      <li>Identify novel, unseen fraud behaviors via unsupervised anomaly detection.</li>
+      <li>Provide instant two-way alerting via an SMS gateway API.</li>
+      <li>Empower customers with a 24/7 rule-driven self-service support chatbot.</li>
+      <li>Enforce hard security barriers (e.g., automated lockout upon 3 failed PIN attempts).</li>
+    </ul>
+  </div>
+  <div class="card highlight">
+    <h4>Technical Stack</h4>
+    <table style="width:100%; font-size:8.5pt; border-collapse:collapse;">
+      <tr><td style="padding:2px 0;"><strong>Language:</strong></td><td>Python 3.10+</td></tr>
+      <tr><td style="padding:2px 0;"><strong>Machine Learning:</strong></td><td>Scikit-learn (Random Forest, Isolation Forest)</td></tr>
+      <tr><td style="padding:2px 0;"><strong>Database:</strong></td><td>MySQL 8.0 (Normalized Relational Schema)</td></tr>
+      <tr><td style="padding:2px 0;"><strong>Frontend:</strong></td><td>HTML5, CSS3, Bootstrap 5.3, JavaScript</td></tr>
+      <tr><td style="padding:2px 0;"><strong>API Gateway:</strong></td><td>Twilio / Fast2SMS REST API</td></tr>
+      <tr><td style="padding:2px 0;"><strong>Dataset:</strong></td><td>Kaggle Credit Card Fraud (284,807 txns)</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION 2: DEPARTMENTAL SUGGESTIONS MAPPING -->
+<h2 class="section-title">2. Departmental Recommendations & Implementation Matrix</h2>
+<p>
+  All departmental guidelines received during preliminary guidance have been rigorously mapped into direct engineering features:
+</p>
+
+<table class="data-table avoid-break">
+  <thead>
+    <tr>
+      <th style="width:28%;">Departmental Guideline</th>
+      <th style="width:36%;">Engineering Implementation</th>
+      <th style="width:36%;">Outcome & Verification</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Role-Based Authentication (RBAC)</strong></td>
+      <td>Dual authentication pipelines for Customer and Bank Admin roles with distinct session tokens.</td>
+      <td>Prevents horizontal and vertical privilege escalation; verifies role authorization per route.</td>
+    </tr>
+    <tr>
+      <td><strong>Secure Data Handling</strong></td>
+      <td>Passwords hashed with bcrypt/SHA-256; card numbers masked (e.g., <code>XXXX-XXXX-XXXX-4821</code>); parameter binding.</td>
+      <td>Mitigates SQL injection, credential theft, and sensitive cardholder disclosure in UI and logs.</td>
+    </tr>
+    <tr>
+      <td><strong>Normalized Database Design</strong></td>
+      <td>7 relational tables in Third Normal Form (3NF) linked via explicit primary and foreign keys.</td>
+      <td>Maintains data integrity across transactions, risk alerts, SMS logs, and chatbot sessions.</td>
+    </tr>
+    <tr>
+      <td><strong>Hybrid Decision Logic</strong></td>
+      <td>Supervised Random Forest (0.7 weight) combined with Unsupervised Isolation Forest (0.3 weight).</td>
+      <td>Combines historical precision with zero-day outlier adaptability.</td>
+    </tr>
+    <tr>
+      <td><strong>Proactive Alerting & Audit Trails</strong></td>
+      <td>Every flagged transaction creates persistent records in <code>FRAUD_ALERT</code> and <code>SMS_LOG</code>.</td>
+      <td>Full forensic audit capability and timestamped delivery accountability.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<!-- SECTION 3: SYSTEM ARCHITECTURE & MODULES -->
+<h2 class="section-title">3. Modular System Architecture</h2>
+<p>
+  The system is organized into seven cohesive modules designed around the principles of separation of concerns and high maintainability:
+</p>
+
+<table class="data-table">
+  <thead>
+    <tr>
+      <th style="width:8%;">#</th>
+      <th style="width:24%;">Module Name</th>
+      <th style="width:40%;">Functional Responsibility</th>
+      <th style="width:28%;">Data Stores Used</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>M1</strong></td>
+      <td><strong>Customer Portal</strong></td>
+      <td>Account registration, authentication, dashboard overview, masked card viewing, transaction history, and self-service block requests.</td>
+      <td><code>CUSTOMER</code>, <code>CARD</code></td>
+    </tr>
+    <tr>
+      <td><strong>M2</strong></td>
+      <td><strong>Admin Control Center</strong></td>
+      <td>Bank manager login, real-time transaction inspection, fraud alert review, manual card freeze/unfreeze, and statistical reporting.</td>
+      <td><code>ADMIN</code>, <code>CARD</code>, <code>FRAUD_ALERT</code></td>
+    </tr>
+    <tr>
+      <td><strong>M3</strong></td>
+      <td><strong>Transaction Engine</strong></td>
+      <td>Card validity verification, expiry validation, available balance/credit limit enforcement, and PIN attempt tracking.</td>
+      <td><code>CARD</code>, <code>TRANSACTION</code></td>
+    </tr>
+    <tr>
+      <td><strong>M4</strong></td>
+      <td><strong>Hybrid ML Fraud Engine</strong></td>
+      <td>Feature scaling, dual-model scoring (Random Forest + Isolation Forest), consolidated risk calculation (0–100), and policy routing.</td>
+      <td><code>TRANSACTION</code>, <code>FRAUD_ALERT</code></td>
+    </tr>
+    <tr>
+      <td><strong>M5</strong></td>
+      <td><strong>Alert & Audit Dispatcher</strong></td>
+      <td>Generates persistent risk alerts, tracks administrative review decisions, and logs forensic details (hit rules, model scores).</td>
+      <td><code>FRAUD_ALERT</code>, <code>TRANSACTION</code></td>
+    </tr>
+    <tr>
+      <td><strong>M6</strong></td>
+      <td><strong>Customer Support Chatbot</strong></td>
+      <td>Interactive assistant: answers cardholder questions, explains alert reasons, displays transaction history, and creates block requests.</td>
+      <td><code>CHAT_LOG</code>, <code>TRANSACTION</code>, <code>CARD</code></td>
+    </tr>
+    <tr>
+      <td><strong>M7</strong></td>
+      <td><strong>SMS Notification Gateway</strong></td>
+      <td>Formats templates under 160 characters, connects to Twilio / Fast2SMS REST API, and monitors delivery status lifecycle.</td>
+      <td><code>SMS_LOG</code>, <code>CUSTOMER</code>, <code>FRAUD_ALERT</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- SECTION 4: HYBRID ML METHODOLOGY -->
+<h2 class="section-title">4. Hybrid Machine Learning Methodology</h2>
+
+<div class="grid-2 avoid-break">
+  <div class="card">
+    <h4>1. Supervised Random Forest Classifier</h4>
+    <p style="font-size:8.5pt;">
+      Trained on the highly imbalanced Kaggle dataset (284,807 transactions, 492 frauds, 0.17% fraud rate).
+      Utilizes an ensemble of decision trees to generate a fraud probability score:
+    </p>
+    <div style="background:#f8fafc; padding:6px; font-family:monospace; font-size:8pt; border:1px solid #e2e8f0; border-radius:4px;">
+      P_RF = Trees_Predicting_Fraud / Total_Trees
+    </div>
+    <p style="font-size:8pt; color:#64748b; margin-top:4px;">
+      Excels at detecting recurring, previously learned fraud patterns with high precision.
+    </p>
+  </div>
+
+  <div class="card">
+    <h4>2. Unsupervised Isolation Forest</h4>
+    <p style="font-size:8.5pt;">
+      Requires no labels. It recursively partitions features using random splits. Anomalies are isolated near the root with short path lengths:
+    </p>
+    <div style="background:#f8fafc; padding:6px; font-family:monospace; font-size:8pt; border:1px solid #e2e8f0; border-radius:4px;">
+      s(x, n) = 2^(-E[h(x)] / c(n))
+    </div>
+    <p style="font-size:8pt; color:#64748b; margin-top:4px;">
+      Configuration: <code>n_estimators=100</code>, <code>contamination=0.0017</code>. Catches zero-day, novel attack patterns.
+    </p>
+  </div>
+</div>
+
+<div class="formula-callout avoid-break">
+  <div style="font-size:9pt; font-weight:600; color:#334155; margin-bottom:4px;">Unified Dynamic Risk Scoring Formulation</div>
+  <div class="formula-text">
+    Risk_Score = [ 0.7 &times; P_RF &times; 100 ] + [ 0.3 &times; Score_IsolationForest &times; 100 ]
+  </div>
+  <div style="font-size:8pt; color:#64748b; margin-top:4px;">
+    Weighting Rationale: 70% supervised confidence on established fraud signatures + 30% unsupervised outlier detection.
+  </div>
+</div>
+
+<h3 class="subsection-title">Dynamic Action Threshold Matrix</h3>
+<table class="data-table avoid-break">
+  <thead>
+    <tr>
+      <th style="width:18%;">Risk Score Band</th>
+      <th style="width:18%;">Decision Action</th>
+      <th style="width:34%;">System Behavior</th>
+      <th style="width:30%;">Notification & Audit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="badge badge-success">0 &ndash; 39 (Low)</span></td>
+      <td><strong>Auto-Approved</strong></td>
+      <td>Transaction executes seamlessly; balance deducted; transaction marked <code>APPROVED</code>.</td>
+      <td>Recorded in standard transaction ledger. No SMS dispatch needed.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-warning">40 &ndash; 69 (Medium)</span></td>
+      <td><strong>Flagged Alert</strong></td>
+      <td>Transaction allowed or put on temporary verification; flagged in <code>FRAUD_ALERT</code>.</td>
+      <td>Instant SMS alert sent to cardholder. Chatbot ready to explain flagging reason.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-danger">70 &ndash; 100 (High)</span></td>
+      <td><strong>Card Blocked</strong></td>
+      <td>Transaction instantly declined; card status transitioned to <code>BLOCKED</code> immediately.</td>
+      <td>Emergency SMS sent to customer and alert flagged on Admin Command Center.</td>
+    </tr>
+    <tr style="background:#fff1f2;">
+      <td><span class="badge badge-danger">Security Override</span></td>
+      <td><strong>3+ Failed PINs</strong></td>
+      <td>Card locked instantly by deterministic rule regardless of the ML score.</td>
+      <td>"Card Locked due to repeated incorrect PINs" SMS dispatched.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<!-- SECTION 5: REAL-TIME SERVICES: CHATBOT & SMS -->
+<h2 class="section-title">5. Real-Time Services: Support Chatbot & SMS Gateway</h2>
+
+<div class="grid-2 avoid-break">
+  <div class="card">
+    <h4>Conversational Customer Assistant (Chatbot)</h4>
+    <p style="font-size:8.5pt;">
+      Embedded directly in the customer dashboard to provide 24/7 self-service without requiring call center delays.
+    </p>
+    <ul style="font-size:8.5pt; padding-left:16px; margin:4px 0;">
+      <li><strong>Intent <code>txn_history</code>:</strong> Displays last 5 transactions with card numbers masked.</li>
+      <li><strong>Intent <code>why_flagged</code>:</strong> Explains model risk score (e.g., <em>"Risk Score 62: Unusually large amount"</em>).</li>
+      <li><strong>Intent <code>block_card</code>:</strong> Requires explicit two-step user confirmation, then updates card status to <code>BLOCKED</code>.</li>
+      <li><strong>Intent <code>report_fraud</code>:</strong> Flags transaction for priority admin manual review.</li>
+    </ul>
+    <div style="background:#f1f5f9; padding:6px 10px; border-radius:4px; font-size:8pt; margin-top:8px;">
+      <strong>Security Guardrail:</strong> Works strictly within authenticated sessions. Never returns full card numbers, CVV, or passwords.
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>SMS Alert Gateway Architecture</h4>
+    <p style="font-size:8.5pt;">
+      Integrated via cloud REST APIs (Twilio / Fast2SMS) using secured environment variables for API keys.
+    </p>
+    <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:4px; padding:8px; font-size:8pt; margin-bottom:8px;">
+      <strong>Template Example (&lt;160 chars):</strong><br>
+      <em>"BANK ALERT: Rs.24,500 spent on card XX4821 looks suspicious (Score: 62). Not you? Open app chatbot or call bank to freeze."</em>
+    </div>
+    <ul style="font-size:8.5pt; padding-left:16px; margin:4px 0;">
+      <li><strong>Delivery State Machine:</strong> <code>QUEUED</code> &rarr; <code>SENT</code> &rarr; <code>DELIVERED</code> / <code>FAILED</code>.</li>
+      <li><strong>Automatic Retry:</strong> Up to 3 retries on network timeout before marking <code>FAILED</code> in <code>SMS_LOG</code>.</li>
+      <li><strong>PCI Compliance:</strong> Messages contain masked digits only (e.g., <code>XX4821</code>).</li>
+    </ul>
+  </div>
+</div>
+
+<!-- SECTION 6: RELATIONAL DATABASE ARCHITECTURE -->
+<h2 class="section-title">6. Normalized Relational Database Architecture (7 Tables)</h2>
+<p>
+  The persistence tier is built on MySQL 8.0, partitioned into 7 third-normal-form (3NF) relational tables ensuring transactional ACID consistency:
+</p>
+
+<table class="data-table avoid-break">
+  <thead>
+    <tr>
+      <th style="width:18%;">Table Name</th>
+      <th style="width:28%;">Primary & Foreign Keys</th>
+      <th style="width:28%;">Key Attribute Columns</th>
+      <th style="width:26%;">Functional Role</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>CUSTOMER</code></td>
+      <td><code>customer_id</code> (PK)</td>
+      <td><code>full_name</code>, <code>email</code>, <code>phone</code>, <code>password_hash</code></td>
+      <td>Stores user profile and contact credentials for SMS.</td>
+    </tr>
+    <tr>
+      <td><code>CARD</code></td>
+      <td><code>card_id</code> (PK)<br><code>customer_id</code> (FK)</td>
+      <td><code>card_number</code>, <code>credit_limit</code>, <code>failed_pin_attempts</code>, <code>status</code></td>
+      <td>Maintains card states: <code>ACTIVE</code>, <code>BLOCKED</code>, <code>FLAGGED</code>.</td>
+    </tr>
+    <tr>
+      <td><code>TRANSACTION</code></td>
+      <td><code>txn_id</code> (PK)<br><code>card_id</code> (FK)</td>
+      <td><code>amount</code>, <code>merchant</code>, <code>location</code>, <code>txn_time</code>, <code>status</code></td>
+      <td>Immutable ledger of processed financial attempts.</td>
+    </tr>
+    <tr>
+      <td><code>FRAUD_ALERT</code></td>
+      <td><code>alert_id</code> (PK)<br><code>txn_id</code> (FK)</td>
+      <td><code>risk_score</code>, <code>rf_prob</code>, <code>iso_score</code>, <code>rule_hit</code>, <code>status</code></td>
+      <td>Stores predictive ML outputs and triage decision logs.</td>
+    </tr>
+    <tr>
+      <td><code>ADMIN</code></td>
+      <td><code>admin_id</code> (PK)</td>
+      <td><code>username</code>, <code>password_hash</code>, <code>role</code>, <code>created_at</code></td>
+      <td>Privileged credentials for bank fraud analysts and officers.</td>
+    </tr>
+    <tr>
+      <td><code>SMS_LOG</code></td>
+      <td><code>sms_id</code> (PK)<br><code>alert_id</code> (FK)</td>
+      <td><code>phone</code>, <code>message</code>, <code>sms_status</code>, <code>sent_time</code></td>
+      <td>Audit trail for telephony delivery confirmation and retries.</td>
+    </tr>
+    <tr>
+      <td><code>CHAT_LOG</code></td>
+      <td><code>chat_id</code> (PK)<br><code>customer_id</code> (FK)</td>
+      <td><code>user_message</code>, <code>intent</code>, <code>bot_reply</code>, <code>chat_time</code></td>
+      <td>Maintains conversation transcripts and self-service action logs.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<!-- SECTION 7: SYSTEM FLOW & ARCHITECTURAL DIAGRAMS -->
+<h2 class="section-title">7. Architectural Data Flow Specifications</h2>
+
+<h3 class="subsection-title">7.1 Level-0 Context Data Flow Diagram (Context DFD)</h3>
+<p style="font-size:9pt;">
+  The Level-0 diagram models the boundary of the Credit Card Fraud Detection System and its communication with external entities (Customer, Bank Administrator, and SMS Gateway API):
+</p>
+
+<div class="diagram-container avoid-break">
+  <!-- Clean SVG for Level 0 DFD -->
+  <svg width="680" height="200" viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;">
+    <!-- Customer Entity -->
+    <rect x="20" y="45" width="120" height="110" rx="6" fill="#0f2537" stroke="#1e3a8a" stroke-width="2"/>
+    <text x="80" y="80" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle">CUSTOMER</text>
+    <text x="80" y="100" fill="#93c5fd" font-size="8.5" text-anchor="middle">&bull; Auth & Txn Req</text>
+    <text x="80" y="115" fill="#93c5fd" font-size="8.5" text-anchor="middle">&bull; Chat Queries</text>
+    <text x="80" y="130" fill="#93c5fd" font-size="8.5" text-anchor="middle">&bull; Card Block Req</text>
+
+    <!-- Center Process: System -->
+    <circle cx="340" cy="100" r="65" fill="#2563eb" stroke="#1e3a8a" stroke-width="3"/>
+    <text x="340" y="85" fill="#ffffff" font-size="9" font-weight="700" text-anchor="middle">0.0</text>
+    <text x="340" y="100" fill="#ffffff" font-size="10.5" font-weight="700" text-anchor="middle">CREDIT CARD FRAUD</text>
+    <text x="340" y="115" fill="#ffffff" font-size="10.5" font-weight="700" text-anchor="middle">DETECTION SYSTEM</text>
+    <text x="340" y="130" fill="#dbeafe" font-size="8" text-anchor="middle">(Hybrid ML + Core Bank)</text>
+
+    <!-- Bank Admin Entity -->
+    <rect x="540" y="15" width="120" height="85" rx="6" fill="#0f2537" stroke="#1e3a8a" stroke-width="2"/>
+    <text x="600" y="45" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle">BANK ADMIN</text>
+    <text x="600" y="65" fill="#93c5fd" font-size="8.5" text-anchor="middle">&bull; Fraud Reviews</text>
+    <text x="600" y="80" fill="#93c5fd" font-size="8.5" text-anchor="middle">&bull; Card Freeze/Unfreeze</text>
+
+    <!-- SMS Gateway Entity -->
+    <rect x="540" y="115" width="120" height="75" rx="6" fill="#0f2537" stroke="#1e3a8a" stroke-width="2"/>
+    <text x="600" y="145" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle">SMS GATEWAY</text>
+    <text x="600" y="165" fill="#93c5fd" font-size="8.5" text-anchor="middle">(Twilio / Fast2SMS API)</text>
+
+    <!-- Flow Arrows Customer <-> System -->
+    <path d="M 140 75 L 275 75" stroke="#0f2537" stroke-width="1.8" marker-end="url(#arrow)" fill="none"/>
+    <text x="207" y="68" font-size="7.5" fill="#334155" text-anchor="middle">Txn / Chat In</text>
+
+    <path d="M 275 125 L 140 125" stroke="#0f2537" stroke-width="1.8" marker-end="url(#arrow)" fill="none"/>
+    <text x="207" y="138" font-size="7.5" fill="#334155" text-anchor="middle">Status / Replies</text>
+
+    <!-- Flow Arrows System <-> Admin -->
+    <path d="M 390 65 L 540 45" stroke="#0f2537" stroke-width="1.8" fill="none"/>
+    <text x="465" y="48" font-size="7.5" fill="#334155" text-anchor="middle">Audit Logs & Reports</text>
+
+    <!-- Flow Arrows System -> SMS Gateway -->
+    <path d="M 390 135 L 540 150" stroke="#0f2537" stroke-width="1.8" fill="none"/>
+    <text x="465" y="155" font-size="7.5" fill="#334155" text-anchor="middle">SMS Dispatch & Status</text>
+
+    <!-- Arrow Definition -->
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f2537"/>
+      </marker>
+    </defs>
+  </svg>
+  <div class="diagram-caption">Figure 7.1: Level-0 Context DFD illustrating core interactions across User, System, and External Services.</div>
+</div>
+
+<h3 class="subsection-title">7.2 Level-1 Functional Process Flow</h3>
+<div class="diagram-container avoid-break">
+  <!-- Clean SVG for Level 1 DFD -->
+  <svg width="680" height="210" viewBox="0 0 680 210" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;">
+    <!-- Process 1.0 -->
+    <rect x="20" y="20" width="130" height="45" rx="5" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="85" y="38" fill="#1e3a8a" font-size="8.5" font-weight="700" text-anchor="middle">1.0 User Auth</text>
+    <text x="85" y="52" fill="#475569" font-size="7.5" text-anchor="middle">RBAC (Customer / Admin)</text>
+
+    <!-- Process 2.0 -->
+    <rect x="190" y="20" width="130" height="45" rx="5" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="255" y="38" fill="#1e3a8a" font-size="8.5" font-weight="700" text-anchor="middle">2.0 Txn Processing</text>
+    <text x="255" y="52" fill="#475569" font-size="7.5" text-anchor="middle">Card / Limit Validation</text>
+
+    <!-- Process 3.0 -->
+    <rect x="360" y="20" width="140" height="45" rx="5" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="430" y="38" fill="#1e3a8a" font-size="8.5" font-weight="700" text-anchor="middle">3.0 Fraud Detection</text>
+    <text x="430" y="52" fill="#475569" font-size="7.5" text-anchor="middle">RF (0.7) + IForest (0.3)</text>
+
+    <!-- Process 4.0 -->
+    <rect x="530" y="20" width="130" height="45" rx="5" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="595" y="38" fill="#1e3a8a" font-size="8.5" font-weight="700" text-anchor="middle">4.0 Alert & Audit</text>
+    <text x="595" y="52" fill="#475569" font-size="7.5" text-anchor="middle">Score &ge; 40 Escalation</text>
+
+    <!-- Process 5.0 -->
+    <rect x="190" y="140" width="130" height="45" rx="5" fill="#fdf2f8" stroke="#db2777" stroke-width="1.5"/>
+    <text x="255" y="158" fill="#9d174d" font-size="8.5" font-weight="700" text-anchor="middle">5.0 Support Chatbot</text>
+    <text x="255" y="172" fill="#475569" font-size="7.5" text-anchor="middle">Self-Service Query/Block</text>
+
+    <!-- Process 6.0 -->
+    <rect x="360" y="140" width="140" height="45" rx="5" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+    <text x="430" y="158" fill="#065f46" font-size="8.5" font-weight="700" text-anchor="middle">6.0 SMS Notification</text>
+    <text x="430" y="172" fill="#475569" font-size="7.5" text-anchor="middle">Twilio Gateway Dispatch</text>
+
+    <!-- Data Stores Box in Center -->
+    <rect x="20" y="85" width="640" height="35" rx="4" fill="#f8fafc" stroke="#94a3b8" stroke-dasharray="4 2"/>
+    <text x="340" y="106" fill="#334155" font-size="8.5" font-weight="600" text-anchor="middle">
+      Shared Relational Stores: D1:CUSTOMER &bull; D2:CARD &bull; D3:TRANSACTION &bull; D4:FRAUD_ALERT &bull; D6:SMS_LOG &bull; D7:CHAT_LOG
+    </text>
+
+    <!-- Connecting Lines -->
+    <line x1="150" y1="42" x2="190" y2="42" stroke="#2563eb" stroke-width="1.5"/>
+    <line x1="320" y1="42" x2="360" y2="42" stroke="#2563eb" stroke-width="1.5"/>
+    <line x1="500" y1="42" x2="530" y2="42" stroke="#2563eb" stroke-width="1.5"/>
+    <line x1="595" y1="65" x2="595" y2="162" stroke="#475569" stroke-width="1.5"/>
+    <line x1="595" y1="162" x2="500" y2="162" stroke="#059669" stroke-width="1.5"/>
+  </svg>
+  <div class="diagram-caption">Figure 7.2: Level-1 DFD illustrating execution pipelining between Transaction, ML Scoring, Chatbot, and SMS.</div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- SECTION 8: VIVA & EXAMINER READINESS -->
+<h2 class="section-title">8. Comprehensive Viva & Examiner Defense Guide</h2>
+<p>
+  Preparation answers for technical queries typically posed by project evaluation committees:
+</p>
+
+<div class="qa-card avoid-break">
+  <div class="qa-question">Q1: Why combine Supervised Random Forest with Unsupervised Isolation Forest?</div>
+  <p class="qa-answer">
+    <strong>Defense:</strong> Supervised models (Random Forest) are exceptionally accurate at recognizing <em>previously observed fraud patterns</em> with high recall. However, fraudsters constantly innovate new patterns that supervised models have never seen before. Isolation Forest is an unsupervised outlier detector that isolates rare points near the tree roots without needing labels, making it ideal for catching <em>novel, zero-day fraud</em>. The 70/30 dynamic ensemble balances known pattern detection with emerging anomaly adaptability.
+  </p>
+</div>
+
+<div class="qa-card avoid-break">
+  <div class="qa-question">Q2: The Kaggle dataset features are PCA components (V1&ndash;V28). How does your web app handle this?</div>
+  <p class="qa-answer">
+    <strong>Defense:</strong> In real commercial banks, $V1$ through $V28$ are transformed behavioral dimensions (e.g., velocity of transactions, geodistance from previous swipe, device fingerprint deviation) anonymized via Principal Component Analysis (PCA) for privacy. For our prototype portal, when a user enters transaction details, our preprocessing pipeline maps behavioral parameters to the PCA vector representation or references a test pool vector to simulate live classification.
+  </p>
+</div>
+
+<div class="qa-card avoid-break">
+  <div class="qa-question">Q3: How do you address the severe class imbalance in the credit card dataset?</div>
+  <p class="qa-answer">
+    <strong>Defense:</strong> In the Kaggle dataset, only 492 out of 284,807 transactions are fraudulent (0.17%). Evaluating purely on accuracy would yield a misleading 99.83% score by simply predicting everything as legitimate. We address this by: (1) using <strong>Precision-Recall AUC</strong> and <strong>F1-score</strong> rather than raw accuracy; (2) tuning <code>class_weight='balanced'</code> in Random Forest; and (3) configuring the <code>contamination=0.0017</code> parameter in Isolation Forest to match the known base rate.
+  </p>
+</div>
+
+<div class="qa-card avoid-break">
+  <div class="qa-question">Q4: Why maintain an independent security rule for 3 failed PIN attempts outside the ML model?</div>
+  <p class="qa-answer">
+    <strong>Defense:</strong> Machine learning generates probabilistic classifications, but brute-force PIN guessing is a deterministic security breach. Waiting for an ML model score could lead to false-negative delays. Therefore, our Transaction Processing Module enforces a deterministic rule: upon the third consecutive failed PIN attempt (<code>CARD.failed_pin_attempts &ge; 3</code>), the card is immediately locked at the database tier regardless of model output.
+  </p>
+</div>
+
+<div class="qa-card avoid-break">
+  <div class="qa-question">Q5: What happens if the third-party SMS API fails during a transaction alert?</div>
+  <p class="qa-answer">
+    <strong>Defense:</strong> The SMS module uses an asynchronous background queue pattern. When an alert triggers, an entry is created in <code>SMS_LOG</code> with status <code>QUEUED</code>. If the gateway encounters a network timeout or API error, the task automatically retries up to 3 times with exponential backoff before transitioning to <code>FAILED</code>. The core transaction decision is not held hostage by SMS gateway latency.
+  </p>
+</div>
+
+<!-- SIGN-OFF FOOTER -->
+<div class="avoid-break" style="margin-top:25px; border-top:1px solid #cbd5e1; padding-top:15px; display:flex; justify-content:space-between; font-size:8.5pt; color:#64748b;">
+  <div>
+    <strong>Project Candidates:</strong> Rahul R A & Yedhu Krishnan G<br>
+    Master of Computer Applications (MCA)
+  </div>
+  <div style="text-align:right;">
+    <strong>Verification Status:</strong> Document Approved for First Review<br>
+    Academic Year 2026 &bull; Mini Project Phase
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,88 @@
+-- Credit Card Fraud Detection System
+-- MySQL Schema for Dummy Bank Application
+-- Designed for Rahul R A & Yedhu Krishnan G
+
+CREATE DATABASE IF NOT EXISTS dummy_bank;
+USE dummy_bank;
+
+-- D1: CUSTOMER Table
+CREATE TABLE IF NOT EXISTS CUSTOMER (
+    customer_id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(50) NOT NULL,
+    email VARCHAR(60) NOT NULL UNIQUE,
+    phone VARCHAR(15) NOT NULL,
+    address VARCHAR(100),
+    password_hash VARCHAR(255) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- D2: CARD Table
+CREATE TABLE IF NOT EXISTS CARD (
+    card_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT NOT NULL,
+    card_number VARCHAR(16) NOT NULL UNIQUE,
+    card_type VARCHAR(15) DEFAULT 'Visa',
+    credit_limit DECIMAL(12, 2) NOT NULL DEFAULT 100000.00,
+    available_limit DECIMAL(12, 2) NOT NULL DEFAULT 100000.00,
+    expiry_date DATE NOT NULL,
+    pin_hash VARCHAR(255) NOT NULL,
+    failed_pin_attempts INT DEFAULT 0,
+    status VARCHAR(10) DEFAULT 'ACTIVE',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES CUSTOMER(customer_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- D3: TRANSACTION Table
+CREATE TABLE IF NOT EXISTS `TRANSACTION` (
+    txn_id INT AUTO_INCREMENT PRIMARY KEY,
+    card_id INT NOT NULL,
+    amount DECIMAL(12, 2) NOT NULL,
+    txn_time DATETIME NOT NULL,
+    merchant VARCHAR(50) NOT NULL,
+    location VARCHAR(30) NOT NULL,
+    status VARCHAR(15) NOT NULL,
+    FOREIGN KEY (card_id) REFERENCES CARD(card_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- D4: FRAUD_ALERT Table
+CREATE TABLE IF NOT EXISTS FRAUD_ALERT (
+    alert_id INT AUTO_INCREMENT PRIMARY KEY,
+    txn_id INT NOT NULL,
+    rule_hit VARCHAR(50) NOT NULL,
+    risk_score INT NOT NULL,
+    rf_prob DECIMAL(6, 4) NOT NULL,
+    iso_score DECIMAL(6, 4) NOT NULL,
+    alert_status VARCHAR(15) DEFAULT 'NEW',
+    alert_time DATETIME NOT NULL,
+    FOREIGN KEY (txn_id) REFERENCES `TRANSACTION`(txn_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- D5: ADMIN Table
+CREATE TABLE IF NOT EXISTS ADMIN (
+    admin_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(30) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    role VARCHAR(20) DEFAULT 'SUPER_ADMIN'
+) ENGINE=InnoDB;
+
+-- D6: SMS_LOG Table
+CREATE TABLE IF NOT EXISTS SMS_LOG (
+    sms_id INT AUTO_INCREMENT PRIMARY KEY,
+    alert_id INT,
+    phone VARCHAR(15) NOT NULL,
+    message VARCHAR(160) NOT NULL,
+    sms_status VARCHAR(15) NOT NULL,
+    sent_time DATETIME NOT NULL,
+    FOREIGN KEY (alert_id) REFERENCES FRAUD_ALERT(alert_id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- D7: CHAT_LOG Table
+CREATE TABLE IF NOT EXISTS CHAT_LOG (
+    chat_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT NOT NULL,
+    user_message VARCHAR(200) NOT NULL,
+    intent VARCHAR(30) NOT NULL,
+    bot_reply VARCHAR(255) NOT NULL,
+    chat_time DATETIME NOT NULL,
+    FOREIGN KEY (customer_id) REFERENCES CUSTOMER(customer_id) ON DELETE CASCADE
+) ENGINE=InnoDB;

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Bank Admin Portal Login - Secure Bank{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-dark text-white text-center py-4 border-bottom border-warning">
+                    <div class="brand-icon mx-auto mb-2 bg-warning-subtle text-warning" style="width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <h4 class="fw-bold mb-1 text-warning">Bank Admin Portal</h4>
+                    <p class="text-white-50 small mb-0">Chief Risk Officer & Fraud Analyst Console</p>
+                </div>
+
+                <div class="card-body p-4 bg-white">
+                    <form method="POST" action="{{ url_for('admin_login') }}">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-dark">Admin Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-user-shield"></i></span>
+                                <input type="text" name="username" id="adminUser" class="form-control" placeholder="e.g. admin" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-dark">Admin Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-key"></i></span>
+                                <input type="password" name="password" id="adminPw" class="form-control" placeholder="••••••••" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-warning w-100 py-2 fw-semibold text-dark shadow-sm mb-3">
+                            <i class="fa-solid fa-lock-open me-2"></i> Authenticate Admin
+                        </button>
+                    </form>
+
+                    <!-- Quick Admin Login Fill -->
+                    <hr class="my-3">
+                    <div class="text-center">
+                        <span class="badge bg-light text-secondary border mb-2">1-Click Admin Access</span>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <button type="button" class="btn btn-xs btn-outline-dark" onclick="fillAdmin('admin', 'admin123')">
+                                <i class="fa-solid fa-user-gear me-1 text-danger"></i> CRO: admin / admin123
+                            </button>
+                            <button type="button" class="btn btn-xs btn-outline-dark" onclick="fillAdmin('analyst', 'admin123')">
+                                <i class="fa-solid fa-magnifying-glass me-1 text-info"></i> Analyst: analyst / admin123
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function fillAdmin(u, p) {
+    document.getElementById('adminUser').value = u;
+    document.getElementById('adminPw').value = p;
+}
+</script>
+{% endblock %}

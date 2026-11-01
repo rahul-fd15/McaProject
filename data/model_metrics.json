@@ -1,0 +1,21 @@
+{
+    "training_timestamp": "2026-10-30 00:47:06",
+    "total_samples": 25000,
+    "rf_metrics": {
+        "roc_auc": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "training_time_sec": 0.26
+    },
+    "iso_metrics": {
+        "roc_auc": 1.0,
+        "n_estimators": 100,
+        "contamination": 0.0017,
+        "training_time_sec": 0.22
+    },
+    "hybrid_metrics": {
+        "roc_auc": 1.0,
+        "formula": "0.7 * (RF_Prob * 100) + 0.3 * (ISO_Score * 100)"
+    }
+}

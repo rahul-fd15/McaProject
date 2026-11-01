@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Customer Login - Secure Bank{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-navy text-white text-center py-4">
+                    <div class="brand-icon mx-auto mb-2 bg-warning-subtle text-warning" style="width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <h4 class="fw-bold mb-1">Customer Login</h4>
+                    <p class="text-white-50 small mb-0">Access your credit cards & transaction shield</p>
+                </div>
+
+                <div class="card-body p-4 bg-white">
+                    <form method="POST" action="{{ url_for('customer_login') }}">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-dark">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-envelope"></i></span>
+                                <input type="email" name="email" id="emailInput" class="form-control" placeholder="e.g. rahul@bank.com" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-dark">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-key"></i></span>
+                                <input type="password" name="password" id="passwordInput" class="form-control" placeholder="••••••••" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold shadow-sm mb-3">
+                            <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Log In
+                        </button>
+
+                        <div class="text-center small text-secondary">
+                            Don't have an account? <a href="{{ url_for('customer_register') }}" class="text-primary fw-semibold text-decoration-none">Register here</a>
+                        </div>
+                    </form>
+
+                    <!-- Quick Demo Credentials Fill -->
+                    <hr class="my-4">
+                    <div class="text-center">
+                        <span class="badge bg-light text-secondary border mb-2">1-Click Demo Login</span>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <button type="button" class="btn btn-xs btn-outline-secondary" onclick="fillCustomer('rahul@bank.com', 'password123')">
+                                <i class="fa-solid fa-user me-1 text-primary"></i> Rahul (4821)
+                            </button>
+                            <button type="button" class="btn btn-xs btn-outline-secondary" onclick="fillCustomer('yedhu@bank.com', 'password123')">
+                                <i class="fa-solid fa-user me-1 text-info"></i> Yedhu (9012)
+                            </button>
+                            <button type="button" class="btn btn-xs btn-outline-secondary" onclick="fillCustomer('priya@bank.com', 'password123')">
+                                <i class="fa-solid fa-user me-1 text-success"></i> Priya (7765)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function fillCustomer(email, pw) {
+    document.getElementById('emailInput').value = email;
+    document.getElementById('passwordInput').value = pw;
+}
+</script>
+{% endblock %}
